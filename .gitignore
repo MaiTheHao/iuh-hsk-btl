@@ -1,0 +1,43 @@
+# --- Java (JDK 17) ---
+*.class
+*.jar
+# Cho phép các file jar trong thư mục lib
+!lib/*.jar
+*.war
+*.ear
+
+# --- OS Specific (Quan trọng cho Cross-OS) ---
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.DS_Store
+.AppleDouble
+.LSOverride
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# --- IDEs (Eclipse, IntelliJ/Antigravity, VS Code) ---
+.metadata/
+bin/
+out/
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.factorypath
+.vscode/
+.history/
+
+# --- Log files ---
+*.log
