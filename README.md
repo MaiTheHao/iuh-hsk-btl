@@ -94,7 +94,36 @@ graph TD
 ---
 
 ## Hướng dẫn cài đặt
-<CHƯA CẬP NHẬT>
+
+Theo dõi các bước dưới đây để thiết lập dự án trên môi trường cục bộ:
+
+### 1. Clone Repository
+Đầu tiên, thực hiện clone dự án về máy:
+```bash
+git clone https://github.com/MaiTheHao/iuh-hsk-btl.git
+```
+
+### 2. Khởi tạo Cơ sở dữ liệu
+Hệ thống sử dụng SQL Server. Bạn cần thực thi các tệp script trong thư mục `sql/`:
+*   **Bước 2.1:** Chạy tệp [init.sql](sql/init.sql) để khởi tạo cấu trúc các bảng.
+*   **Bước 2.2 (Tùy chọn):** Chạy tệp [mock.sql](sql/mock.sql) nếu bạn muốn nạp dữ liệu mẫu để thử nghiệm.
+
+### 3. Cấu hình Môi trường
+Ứng dụng yêu cầu tệp cấu hình XML để kết nối cơ sở dữ liệu:
+1.  Vào thư mục [resources/](resources/).
+2.  Sao chép tệp `env.example.xml` và đổi tên thành `env.xml`.
+3.  Mở `env.xml` và cập nhật thông tin tài khoản SQL Server của bạn:
+    ```xml
+    <db>
+        <url>jdbc:sqlserver://localhost:1433;databaseName=YOUR_DB_NAME</url>
+        <user>YOUR_USER</user>
+        <password>YOUR_PASSWORD</password>
+    </db>
+    ```
+
+### 4. Khởi chạy Ứng dụng
+Sau khi đã cấu hình xong, bạn có thể chạy ứng dụng thông qua tệp main:
+*   Mở và chạy tệp [src/App.java](src/App.java).
 
 ---
 
