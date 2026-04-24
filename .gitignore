@@ -5,6 +5,7 @@
 !lib/*.jar
 *.war
 *.ear
+*.dbdiagram
 
 # --- OS Specific (Quan trọng cho Cross-OS) ---
 # Windows
