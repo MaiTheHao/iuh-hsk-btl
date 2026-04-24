@@ -115,7 +115,7 @@ Hệ thống sử dụng SQL Server. Bạn cần thực thi các tệp script tr
 3.  Mở `env.xml` và cập nhật thông tin tài khoản SQL Server của bạn:
     ```xml
     <db>
-        <url>jdbc:sqlserver://localhost:1433;databaseName=YOUR_DB_NAME</url>
+        <url>jdbc:sqlserver://localhost:1433;databaseName=YOUR_DB_NAME;encrypt=true;trustServerCertificate=true</url>
         <user>YOUR_USER</user>
         <password>YOUR_PASSWORD</password>
     </db>
