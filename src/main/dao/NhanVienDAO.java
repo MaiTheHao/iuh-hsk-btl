@@ -1,10 +1,10 @@
-package dao;
+package main.dao;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import dto.NhanVienGetListCriteria;
-import dto.PaginatedResponse;
-import entity.NhanVien;
+import main.dto.NhanVienGetListCriteria;
+import main.dto.PaginatedResponse;
+import main.entity.NhanVien;
 
 public class NhanVienDAO {
     private static NhanVienDAO instance = new NhanVienDAO();

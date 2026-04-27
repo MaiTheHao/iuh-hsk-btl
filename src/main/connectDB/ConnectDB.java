@@ -1,4 +1,4 @@
-package connectDB;
+package main.connectDB;
 
 import java.io.File;
 import java.sql.Connection;

@@ -1,15 +1,16 @@
-package dao;
+package main.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import connectDB.ConnectDB;
-import dto.PaginatedResponse;
-import dto.SanPhamGetListCriteria;
-import entity.LoaiSP;
-import entity.SanPham;
-import enumeration.TrangThaiSP;
+import main.connectDB.ConnectDB;
+import main.dto.PaginatedResponse;
+import main.dto.SanPhamGetListCriteria;
+import main.entity.LoaiSP;
+import main.entity.SanPham;
+import main.enumeration.SortDirection;
+import main.enumeration.TrangThaiSP;
 
 public class SanPhamDAO {
     private static SanPhamDAO instance = new SanPhamDAO();
@@ -60,10 +61,10 @@ public class SanPhamDAO {
             sql.append(whereQuery);
 
             StringBuilder orderBy = new StringBuilder();
-            if (criteria.sapXepMa() != enumeration.SortDirection.NONE) {
+            if (criteria.sapXepMa() != SortDirection.NONE) {
                 orderBy.append("sp.ma ").append(criteria.sapXepMa());
             }
-            if (criteria.sapXepGia() != enumeration.SortDirection.NONE) {
+            if (criteria.sapXepGia() != SortDirection.NONE) {
                 if (orderBy.length() > 0) orderBy.append(", ");
                 orderBy.append("sp.gia ").append(criteria.sapXepGia());
             }

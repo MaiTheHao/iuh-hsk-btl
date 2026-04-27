@@ -1,6 +1,6 @@
-package entity;
+package main.entity;
 
-import enumeration.TrangThaiHD;
+import main.enumeration.TrangThaiHD;
 import java.time.LocalDateTime;
 import java.util.Objects;
 

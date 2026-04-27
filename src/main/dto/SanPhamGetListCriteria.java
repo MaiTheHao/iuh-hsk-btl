@@ -1,6 +1,6 @@
-package dto;
+package main.dto;
 
-import enumeration.SortDirection;
+import main.enumeration.SortDirection;
 
 public record SanPhamGetListCriteria(
     String maLoai,

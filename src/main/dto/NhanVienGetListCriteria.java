@@ -1,7 +1,7 @@
-package dto;
+package main.dto;
 
-import enumeration.LoaiNV;
-import enumeration.SortDirection;
+import main.enumeration.LoaiNV;
+import main.enumeration.SortDirection;
 
 public record NhanVienGetListCriteria(
     String tuKhoa,

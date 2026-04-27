@@ -1,6 +1,6 @@
-package entity;
+package main.entity;
 
-import enumeration.TrangThaiSP;
+import main.enumeration.TrangThaiSP;
 import java.util.Objects;
 
 public class SanPham {

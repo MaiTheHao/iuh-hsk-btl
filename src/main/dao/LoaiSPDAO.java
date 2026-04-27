@@ -1,13 +1,14 @@
-package dao;
+package main.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import connectDB.ConnectDB;
-import dto.LoaiSPGetListCriteria;
-import dto.PaginatedResponse;
-import entity.LoaiSP;
+import main.connectDB.ConnectDB;
+import main.dto.LoaiSPGetListCriteria;
+import main.dto.PaginatedResponse;
+import main.entity.LoaiSP;
+import main.enumeration.SortDirection;
 
 public class LoaiSPDAO {
   private static LoaiSPDAO instance = new LoaiSPDAO();
@@ -37,10 +38,10 @@ public class LoaiSPDAO {
       StringBuilder sql = new StringBuilder("SELECT * FROM LoaiSP ");
 
       StringBuilder orderBy = new StringBuilder();
-      if (criteria.sapXepMa() != enumeration.SortDirection.NONE) {
+      if (criteria.sapXepMa() != SortDirection.NONE) {
         orderBy.append("ma ").append(criteria.sapXepMa());
       }
-      if (criteria.sapXepTen() != enumeration.SortDirection.NONE) {
+      if (criteria.sapXepTen() != SortDirection.NONE) {
         if (orderBy.length() > 0) orderBy.append(", ");
         orderBy.append("ten ").append(criteria.sapXepTen());
       }

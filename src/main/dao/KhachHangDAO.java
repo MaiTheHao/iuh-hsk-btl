@@ -1,14 +1,14 @@
-package dao;
+package main.dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import connectDB.ConnectDB;
-import dto.KhachHangGetListCriteria;
-import dto.PaginatedResponse;
-import entity.KhachHang;
-import enumeration.SortDirection;
+import main.connectDB.ConnectDB;
+import main.dto.KhachHangGetListCriteria;
+import main.dto.PaginatedResponse;
+import main.entity.KhachHang;
+import main.enumeration.SortDirection;
 
 public class KhachHangDAO {
     private static KhachHangDAO instance = new KhachHangDAO();
@@ -20,20 +20,7 @@ public class KhachHangDAO {
         return instance;
     }
 
-    /**
-     * Lấy danh sách khách hàng có phân trang, lọc và sắp xếp
-     * @param criteria Điều kiện lọc và phân trang
-     * @return PaginatedResponse<KhachHang>
-     */
     public PaginatedResponse<KhachHang> getList(KhachHangGetListCriteria criteria) {
-        // TODO: HƯỚNG DẪN TRIỂN KHAI (Xóa sau khi hoàn thành):
-        // 1. Tham khảo SanPhamDAO.java (Join bảng, lọc đa tiêu chí, phân trang).
-        // 2. Tham khảo LoaiSPDAO.java (Thao tác cơ bản trên 1 bảng).
-        // 3. Quy trình thực hiện:
-        //    - Tính offset: (page - 1) * limit.
-        //    - SELECT COUNT(*) FROM KhachHang WHERE 1=1 ... (nối keyword) để lấy totalItems.
-        //    - SELECT * FROM KhachHang WHERE 1=1 ... (nối keyword)
-        //    - Thêm ORDER BY (tên/điểm) và phân trang OFFSET ? ROWS FETCH NEXT ? ROWS ONLY.
         
         List<KhachHang> result = new ArrayList<>();
         Integer limit = criteria.limit();
@@ -109,13 +96,7 @@ public class KhachHangDAO {
         return new PaginatedResponse<>(result, page != null ? page : 1, limit != null ? limit : result.size(), totalItems);
     }
 
-    /**
-     * Tìm kiếm khách hàng theo số điện thoại
-     * @param sdt Số điện thoại khách hàng cần tìm
-     * @return Optional<KhachHang>
-     */
     public Optional<KhachHang> getBySdt(String sdt) {
-        // TODO: Thực hiện câu lệnh SQL SELECT * FROM KhachHang WHERE sdt = ?
         String sql = "SELECT * FROM KhachHang WHERE sdt = ?";
         try (
             Connection conn = ConnectDB.getConnection();
@@ -132,13 +113,7 @@ public class KhachHangDAO {
         return Optional.empty();
     }
 
-    /**
-     * Thêm mới một khách hàng vào cơ sở dữ liệu
-     * @param kh Đối tượng khách hàng cần thêm
-     * @return boolean true nếu thêm thành công, false nếu thất bại
-     */
     public boolean add(KhachHang kh) {
-        // TODO: Thực hiện câu lệnh SQL INSERT INTO KhachHang (sdt, ten, diem) VALUES (?, ?, ?)
         String sql = "INSERT INTO KhachHang (sdt, ten, diem) VALUES (?, ?, ?)";
         try (
             Connection conn = ConnectDB.getConnection();
@@ -154,13 +129,7 @@ public class KhachHangDAO {
         return false;
     }
 
-    /**
-     * Cập nhật thông tin khách hàng đã tồn tại
-     * @param kh Đối tượng khách hàng với thông tin mới (sdt không đổi)
-     * @return boolean true nếu cập nhật thành công, false nếu thất bại
-     */
     public boolean update(KhachHang kh) {
-        // TODO: Thực hiện câu lệnh SQL UPDATE KhachHang SET ten = ?, diem = ? WHERE sdt = ?
         String sql = "UPDATE KhachHang SET ten = ?, diem = ? WHERE sdt = ?";
         try (
             Connection conn = ConnectDB.getConnection();
@@ -176,14 +145,7 @@ public class KhachHangDAO {
         return false;
     }
 
-    /**
-     * Xóa khách hàng khỏi cơ sở dữ liệu theo số điện thoại
-     * @param sdt Số điện thoại khách hàng cần xóa
-     * @return boolean true nếu xóa thành công, false nếu thất bại
-     */
     public boolean delete(String sdt) {
-        // TODO: Thực hiện câu lệnh SQL DELETE FROM KhachHang WHERE sdt = ?
-        // Lưu ý: Cần kiểm tra ràng buộc khóa ngoại (ví dụ: khách hàng đã có trong hóa đơn thì không được xóa)
         String sql = "DELETE FROM KhachHang WHERE sdt = ?";
         try (
             Connection conn = ConnectDB.getConnection();

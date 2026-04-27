@@ -1,6 +1,6 @@
-package entity;
+package main.entity;
 
-import enumeration.LoaiNV;
+import main.enumeration.LoaiNV;
 import java.util.Objects;
 
 public class NhanVien {
