@@ -42,6 +42,7 @@ public class SanPhamDAO {
 
         long totalItems = 0;
         try (Connection conn = ConnectDB.getConnection()) {
+ 
             String countSql = "SELECT COUNT(*) FROM SanPham sp WHERE 1=1 " + whereQuery;
             try (PreparedStatement psCount = conn.prepareStatement(countSql)) {
                 int pIndex = 1;
@@ -110,46 +111,81 @@ public class SanPhamDAO {
         return new PaginatedResponse<>(result, page != null ? page : 1, limit != null ? limit : result.size(), totalItems);
     }
 
-    /**
-     * Tìm kiếm sản phẩm theo mã
-     * @param ma Mã sản phẩm cần tìm
-     * @return Optional<SanPham>
-     */
     public Optional<SanPham> getByMa(String ma) {
-        // TODO: Thực hiện câu lệnh SQL SELECT * FROM SanPham sp LEFT JOIN LoaiSP l ON sp.maLoai = l.ma WHERE sp.ma = ?
-        // Trả về Optional chứa đối tượng SanPham nếu tìm thấy, ngược lại trả về Optional.empty()
+        String sql = "SELECT sp.*, l.ten AS tenLoai, l.moTa AS moTaLoai " +
+                     "FROM SanPham sp " +
+                     "LEFT JOIN LoaiSP l ON sp.maLoai = l.ma " +
+                     "WHERE sp.ma = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ma);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                SanPham sp = new SanPham(
+                    rs.getString("ma"),
+                    rs.getString("ten"),
+                    rs.getString("moTa"),
+                    rs.getString("anh"),
+                    rs.getDouble("gia"),
+                    rs.getInt("soLuong"),
+                    new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
+                    TrangThaiSP.valueOf(rs.getString("trangThai"))
+                );
+                return Optional.of(sp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return Optional.empty();
     }
 
-    /**
-     * Thêm mới một sản phẩm vào cơ sở dữ liệu
-     * @param sp Đối tượng sản phẩm cần thêm
-     * @return boolean true nếu thêm thành công, false nếu thất bại
-     */
     public boolean add(SanPham sp) {
-        // TODO: Thực hiện câu lệnh SQL INSERT INTO SanPham (...) VALUES (...)
-        // Lưu ý: Kiểm tra tính toàn vẹn dữ liệu (mã loại sản phẩm phải tồn tại)
+        String sql = "INSERT INTO SanPham (ma, ten, moTa, anh, gia, soLuong, maLoai, trangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sp.getMa());
+            ps.setString(2, sp.getTen());
+            ps.setString(3, sp.getMoTa());
+            ps.setString(4, sp.getAnh());
+            ps.setDouble(5, sp.getGia());
+            ps.setInt(6, sp.getSoLuong());
+            ps.setString(7, sp.getLoai().getMa());
+            ps.setString(8, sp.getTrangThai().name());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    /**
-     * Cập nhật thông tin sản phẩm đã tồn tại
-     * @param sp Đối tượng sản phẩm với thông tin mới (ma không đổi)
-     * @return boolean true nếu cập nhật thành công, false nếu thất bại
-     */
     public boolean update(SanPham sp) {
-        // TODO: Thực hiện câu lệnh SQL UPDATE SanPham SET ... WHERE ma = ?
+        String sql = "UPDATE SanPham SET ten = ?, moTa = ?, anh = ?, gia = ?, soLuong = ?, maLoai = ?, trangThai = ? WHERE ma = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, sp.getTen());
+            ps.setString(2, sp.getMoTa());
+            ps.setString(3, sp.getAnh());
+            ps.setDouble(4, sp.getGia());
+            ps.setInt(5, sp.getSoLuong());
+            ps.setString(6, sp.getLoai().getMa());
+            ps.setString(7, sp.getTrangThai().name());
+            ps.setString(8, sp.getMa());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    /**
-     * Xóa sản phẩm khỏi cơ sở dữ liệu theo mã
-     * @param ma Mã sản phẩm cần xóa
-     * @return boolean true nếu xóa thành công, false nếu thất bại
-     */
     public boolean delete(String ma) {
-        // TODO: Thực hiện câu lệnh SQL DELETE FROM SanPham WHERE ma = ?
-        // Lưu ý: Cần kiểm tra ràng buộc khóa ngoại (ví dụ: sản phẩm đã có trong hóa đơn thì không được xóa)
+        String sql = "DELETE FROM SanPham WHERE ma = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ma);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi xóa sản phẩm: " + e.getMessage());
+        }
         return false;
     }
 }
