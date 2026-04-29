@@ -48,7 +48,7 @@ CREATE TABLE [HoaDon] (
   [sdtKH] varchar(20),
   [ngayLap] datetime DEFAULT (GETDATE()),
   [tongTien] decimal(18,2),
-  [vat] decimal(5,2),
+  [vat] decimal(18,2),
   [trangThai] varchar(20) NOT NULL CHECK ([trangThai] IN ('PENDING', 'PAID', 'CANCELLED')) DEFAULT 'PAID'
 )
 GO

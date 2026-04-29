@@ -44,4 +44,4 @@ out/
 *.log
 
 # --- Local Environment ---
-resources/env.xml
+**/resources/env.xml

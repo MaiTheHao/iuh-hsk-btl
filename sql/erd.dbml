@@ -51,7 +51,7 @@ Table HoaDon {
     sdtKH varchar [ref: > KhachHang.sdt]
     ngayLap datetime [default: `now()`]
     tongTien decimal(18,2)
-    vat decimal(5,2)
+    vat decimal(18,2)
     trangThai TrangThaiHD [default: 'PAID']
 }
 

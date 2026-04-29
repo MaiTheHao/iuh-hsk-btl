@@ -1,0 +1,2 @@
+ALTER TABLE HoaDon ALTER COLUMN vat decimal(18,2);
+GO
