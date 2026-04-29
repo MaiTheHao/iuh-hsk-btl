@@ -22,11 +22,6 @@ public class LoaiSPDAO {
   public PaginatedResponse<LoaiSP> getList(LoaiSPGetListCriteria criteria) {
     List<LoaiSP> result = new ArrayList<>();
     
-    Integer limit = criteria.limit();
-    Integer page = criteria.page();
-    int offset = (limit != null && limit > 0 && page != null && page > 0) ? (page - 1) * limit : 0;
-    boolean isPaginate = (limit != null && limit > 0);
-
     long totalItems = 0;
     try (Connection conn = ConnectDB.getConnection()) {
       String countSql = "SELECT COUNT(*) FROM LoaiSP";
@@ -38,28 +33,28 @@ public class LoaiSPDAO {
       StringBuilder sql = new StringBuilder("SELECT * FROM LoaiSP ");
 
       StringBuilder orderBy = new StringBuilder();
-      if (criteria.sapXepMa() != SortDirection.NONE) {
-        orderBy.append("ma ").append(criteria.sapXepMa());
+      if (criteria.getSapXepMa() != SortDirection.NONE) {
+        orderBy.append("ma ").append(criteria.getSapXepMa());
       }
-      if (criteria.sapXepTen() != SortDirection.NONE) {
+      if (criteria.getSapXepTen() != SortDirection.NONE) {
         if (orderBy.length() > 0) orderBy.append(", ");
-        orderBy.append("ten ").append(criteria.sapXepTen());
+        orderBy.append("ten ").append(criteria.getSapXepTen());
       }
 
       if (orderBy.length() > 0) {
         sql.append("ORDER BY ").append(orderBy).append(" ");
-      } else if (isPaginate) {
+      } else if (criteria.isPaginate()) {
         sql.append("ORDER BY ma ASC ");
       }
 
-      if (isPaginate) {
+      if (criteria.isPaginate()) {
         sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
       }
 
       try (PreparedStatement psData = conn.prepareStatement(sql.toString())) {
-        if (isPaginate) {
-          psData.setInt(1, offset);
-          psData.setInt(2, limit);
+        if (criteria.isPaginate()) {
+          psData.setInt(1, criteria.getOffset());
+          psData.setInt(2, criteria.getLimit());
         }
 
         ResultSet rs = psData.executeQuery();
@@ -75,7 +70,7 @@ public class LoaiSPDAO {
       e.printStackTrace();
     }
 
-    return new PaginatedResponse<>(result, page != null ? page : 1, limit != null ? limit : result.size(), totalItems);
+    return new PaginatedResponse<>(result, criteria.getPage(), criteria.getLimit() != null ? criteria.getLimit() : result.size(), totalItems);
   }
 
   public Optional<LoaiSP> getByMa(String ma) {

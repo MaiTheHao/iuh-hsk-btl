@@ -21,15 +21,10 @@ public class KhachHangDAO {
     }
 
     public PaginatedResponse<KhachHang> getList(KhachHangGetListCriteria criteria) {
-        
         List<KhachHang> result = new ArrayList<>();
-        Integer limit = criteria.limit();
-        Integer page = criteria.page();
-        int offset = (limit != null && limit > 0 && page != null && page > 0) ? (page - 1) * limit : 0;
-        boolean isPaginate = (limit != null && limit > 0);
-
+        
         StringBuilder whereQuery = new StringBuilder();
-        if (criteria.tuKhoa() != null && !criteria.tuKhoa().isEmpty()) {
+        if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
             whereQuery.append("AND (ten LIKE ? OR sdt LIKE ?) ");
         }
 
@@ -38,9 +33,9 @@ public class KhachHangDAO {
             String countSql = "SELECT COUNT(*) FROM KhachHang WHERE 1=1 " + whereQuery;
             try (PreparedStatement psCount = conn.prepareStatement(countSql)) {
                 int pIndex = 1;
-                if (criteria.tuKhoa() != null && !criteria.tuKhoa().isEmpty()) {
-                    psCount.setString(pIndex++, "%" + criteria.tuKhoa() + "%");
-                    psCount.setString(pIndex++, "%" + criteria.tuKhoa() + "%");
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
+                    psCount.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                    psCount.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
                 }
                 ResultSet rsCount = psCount.executeQuery();
                 if (rsCount.next()) totalItems = rsCount.getLong(1);
@@ -50,34 +45,34 @@ public class KhachHangDAO {
             sql.append(whereQuery);
 
             StringBuilder orderBy = new StringBuilder();
-            if (criteria.sapXepTen() != SortDirection.NONE) {
-                orderBy.append("ten ").append(criteria.sapXepTen());
+            if (criteria.getSapXepTen() != SortDirection.NONE) {
+                orderBy.append("ten ").append(criteria.getSapXepTen());
             }
-            if (criteria.sapXepDiem() != SortDirection.NONE) {
+            if (criteria.getSapXepDiem() != SortDirection.NONE) {
                 if (orderBy.length() > 0) orderBy.append(", ");
-                orderBy.append("diem ").append(criteria.sapXepDiem());
+                orderBy.append("diem ").append(criteria.getSapXepDiem());
             }
 
             if (orderBy.length() > 0) {
                 sql.append("ORDER BY ").append(orderBy).append(" ");
-            } else if (isPaginate) {
+            } else if (criteria.isPaginate()) {
                 sql.append("ORDER BY ten ASC ");
             }
 
-            if (isPaginate) {
+            if (criteria.isPaginate()) {
                 sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
             }
 
             try (PreparedStatement psData = conn.prepareStatement(sql.toString())) {
                 int pIndex = 1;
-                if (criteria.tuKhoa() != null && !criteria.tuKhoa().isEmpty()) {
-                    psData.setString(pIndex++, "%" + criteria.tuKhoa() + "%");
-                    psData.setString(pIndex++, "%" + criteria.tuKhoa() + "%");
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
+                    psData.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                    psData.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
                 }
                 
-                if (isPaginate) {
-                    psData.setInt(pIndex++, offset);
-                    psData.setInt(pIndex++, limit);
+                if (criteria.isPaginate()) {
+                    psData.setInt(pIndex++, criteria.getOffset());
+                    psData.setInt(pIndex++, criteria.getLimit());
                 }
 
                 ResultSet rs = psData.executeQuery();
@@ -93,7 +88,7 @@ public class KhachHangDAO {
             e.printStackTrace();
         }
 
-        return new PaginatedResponse<>(result, page != null ? page : 1, limit != null ? limit : result.size(), totalItems);
+        return new PaginatedResponse<>(result, criteria.getPage(), criteria.getLimit() != null ? criteria.getLimit() : result.size(), totalItems);
     }
 
     public Optional<KhachHang> getBySdt(String sdt) {
