@@ -20,6 +20,7 @@ public class LoaiSPDAO {
   }
 
   public PaginatedResponse<LoaiSP> getList(LoaiSPGetListCriteria criteria) {
+    if (criteria == null) criteria = new LoaiSPGetListCriteria();
     List<LoaiSP> result = new ArrayList<>();
     
     long totalItems = 0;

@@ -23,6 +23,7 @@ public class SanPhamDAO {
     }
 
     public PaginatedResponse<SanPham> getList(SanPhamGetListCriteria criteria) {
+        if (criteria == null) criteria = new SanPhamGetListCriteria();
         List<SanPham> result = new ArrayList<>();
 
         StringBuilder whereQuery = new StringBuilder();

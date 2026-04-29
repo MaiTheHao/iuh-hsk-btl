@@ -21,6 +21,7 @@ public class KhachHangDAO {
     }
 
     public PaginatedResponse<KhachHang> getList(KhachHangGetListCriteria criteria) {
+        if (criteria == null) criteria = new KhachHangGetListCriteria();
         List<KhachHang> result = new ArrayList<>();
         
         StringBuilder whereQuery = new StringBuilder();

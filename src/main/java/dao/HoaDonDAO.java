@@ -24,6 +24,7 @@ public class HoaDonDAO {
     }
 
     public PaginatedResponse<HoaDon> getList(HoaDonGetListCriteria criteria) {
+        if (criteria == null) criteria = new HoaDonGetListCriteria();
         List<HoaDon> result = new ArrayList<>();
         StringBuilder whereQuery = new StringBuilder();
 
