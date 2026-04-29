@@ -22,10 +22,10 @@ INSERT INTO [SanPham] ([ma], [ten], [moTa], [anh], [gia], [soLuong], [maLoai], [
 GO
 
 -- 3. Mock dữ liệu cho NhanVien (Nhân Viên)
-INSERT INTO [NhanVien] ([ma], [ten], [sdt], [matKhau], [loai]) VALUES
-('admin01', N'Admin Hào', '0832690938', 'SystemAdmin@123', 'ADMIN'),
-('admin02', N'Admin Vỹ', '0985138313', 'SystemAdmin@123', 'ADMIN'),
-('admin03', N'Admin Nhựt', '0355455564', 'SystemAdmin@123', 'ADMIN')
+INSERT INTO [NhanVien] ([ma], [ten], [sdt], [matKhau], [anh], [loai]) VALUES
+('admin01', N'Admin Hào', '0832690938', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hao', 'ADMIN'),
+('admin02', N'Admin Vỹ', '0985138313', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vy', 'ADMIN'),
+('admin03', N'Admin Nhựt', '0355455564', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nhut', 'ADMIN')
 GO
 
 -- 4. Mock dữ liệu cho KhachHang (Khách Hàng)

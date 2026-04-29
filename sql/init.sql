@@ -30,6 +30,7 @@ CREATE TABLE [NhanVien] (
   [ten] nvarchar(255) NOT NULL,
   [sdt] varchar(20) UNIQUE NOT NULL,
   [matKhau] varchar(255) NOT NULL,
+  [anh] nvarchar(max),
   [loai] varchar(20) NOT NULL CHECK ([loai] IN ('ADMIN', 'STAFF'))
 )
 GO

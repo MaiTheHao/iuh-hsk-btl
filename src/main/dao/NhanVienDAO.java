@@ -86,7 +86,8 @@ public class NhanVienDAO {
                         rs.getString("ten"),
                         rs.getString("sdt"),
                         rs.getString("matKhau"),
-                        LoaiNV.valueOf(rs.getString("loai"))
+                        rs.getString("anh"),
+                        LoaiNV.fromString(rs.getString("loai"))
                     ));
                 }
             }
@@ -111,7 +112,8 @@ public class NhanVienDAO {
                     rs.getString("ten"),
                     rs.getString("sdt"),
                     rs.getString("matKhau"),
-                    LoaiNV.valueOf(rs.getString("loai"))
+                    rs.getString("anh"),
+                    LoaiNV.fromString(rs.getString("loai"))
                 ));
             }
         } catch (SQLException e) {
@@ -121,7 +123,7 @@ public class NhanVienDAO {
     }
 
     public boolean add(NhanVien nv) {
-        String sql = "INSERT INTO NhanVien (ma, ten, sdt, matKhau, loai) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO NhanVien (ma, ten, sdt, matKhau, anh, loai) VALUES (?, ?, ?, ?, ?, ?)";
         try (
             Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -130,7 +132,8 @@ public class NhanVienDAO {
             ps.setString(2, nv.getTen());
             ps.setString(3, nv.getSdt());
             ps.setString(4, nv.getMatKhau());
-            ps.setString(5, nv.getLoai().name());
+            ps.setString(5, nv.getAnh());
+            ps.setString(6, nv.getLoai().name());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,7 +142,7 @@ public class NhanVienDAO {
     }
 
     public boolean update(NhanVien nv) {
-        String sql = "UPDATE NhanVien SET ten = ?, sdt = ?, matKhau = ?, loai = ? WHERE ma = ?";
+        String sql = "UPDATE NhanVien SET ten = ?, sdt = ?, matKhau = ?, anh = ?, loai = ? WHERE ma = ?";
         try (
             Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -147,8 +150,9 @@ public class NhanVienDAO {
             ps.setString(1, nv.getTen());
             ps.setString(2, nv.getSdt());
             ps.setString(3, nv.getMatKhau());
-            ps.setString(4, nv.getLoai().name());
-            ps.setString(5, nv.getMa());
+            ps.setString(4, nv.getAnh());
+            ps.setString(5, nv.getLoai().name());
+            ps.setString(6, nv.getMa());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,5 +172,30 @@ public class NhanVienDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public Optional<NhanVien> authenticate(String sdt, String matKhau) {
+        String sql = "SELECT * FROM NhanVien WHERE sdt = ? AND matKhau = ?";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setString(1, sdt);
+            ps.setString(2, matKhau);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return Optional.of(new NhanVien(
+                    rs.getString("ma"),
+                    rs.getString("ten"),
+                    rs.getString("sdt"),
+                    rs.getString("matKhau"),
+                    rs.getString("anh"),
+                    LoaiNV.fromString(rs.getString("loai"))
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 }

@@ -96,7 +96,7 @@ public class SanPhamDAO {
                         rs.getDouble("gia"),
                         rs.getInt("soLuong"),
                         new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
-                        TrangThaiSP.valueOf(rs.getString("trangThai"))
+                        TrangThaiSP.fromString(rs.getString("trangThai"))
                     ));
                 }
             }
@@ -107,7 +107,7 @@ public class SanPhamDAO {
     }
 
     public Optional<SanPham> getByMa(String ma) {
-        String sql = "SELECT * FROM LoaiSP WHERE ma = ? LEFT JOIN LoaiSP l ON sp.maLoai = l.ma";
+        String sql = "SELECT sp.*, l.ten AS tenLoai, l.moTa AS moTaLoai FROM SanPham sp LEFT JOIN LoaiSP l ON sp.maLoai = l.ma WHERE sp.ma = ?";
         try (
             Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -123,7 +123,7 @@ public class SanPhamDAO {
                     rs.getDouble("gia"),
                     rs.getInt("soLuong"),
                     new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
-                    TrangThaiSP.valueOf(rs.getString("trangThai"))
+                    TrangThaiSP.fromString(rs.getString("trangThai"))
                 ));
             }
         } catch (Exception e) {

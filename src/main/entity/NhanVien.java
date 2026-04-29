@@ -8,6 +8,7 @@ public class NhanVien {
     private String ten;
     private String sdt;
     private String matKhau;
+    private String anh;
     private LoaiNV loai;
 
     public NhanVien() {
@@ -17,11 +18,12 @@ public class NhanVien {
         setMa(ma);
     }
 
-    public NhanVien(String ma, String ten, String sdt, String matKhau, LoaiNV loai) {
+    public NhanVien(String ma, String ten, String sdt, String matKhau, String anh, LoaiNV loai) {
         setMa(ma);
         setTen(ten);
         setSdt(sdt);
         setMatKhau(matKhau);
+        setAnh(anh);
         setLoai(loai);
     }
 
@@ -55,6 +57,14 @@ public class NhanVien {
 
     public void setMatKhau(String matKhau) {
         this.matKhau = matKhau;
+    }
+
+    public String getAnh() {
+        return anh;
+    }
+
+    public void setAnh(String anh) {
+        this.anh = anh;
     }
 
     public LoaiNV getLoai() {
