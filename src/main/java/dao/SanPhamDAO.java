@@ -29,6 +29,9 @@ public class SanPhamDAO {
         if (criteria.getMaLoai() != null && !criteria.getMaLoai().isEmpty()) {
             whereQuery.append("AND sp.maLoai = ? ");
         }
+        if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
+            whereQuery.append("AND (sp.ten LIKE ? OR sp.moTa LIKE ?) ");
+        }
         if (criteria.getGiaTu() != null) {
             whereQuery.append("AND sp.gia >= ? ");
         }
@@ -42,6 +45,10 @@ public class SanPhamDAO {
             try (PreparedStatement psCount = conn.prepareStatement(countSql)) {
                 int pIndex = 1;
                 if (criteria.getMaLoai() != null && !criteria.getMaLoai().isEmpty()) psCount.setString(pIndex++, criteria.getMaLoai());
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
+                    psCount.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                    psCount.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                }
                 if (criteria.getGiaTu() != null) psCount.setDouble(pIndex++, criteria.getGiaTu());
                 if (criteria.getGiaDen() != null) psCount.setDouble(pIndex++, criteria.getGiaDen());
                 ResultSet rsCount = psCount.executeQuery();
