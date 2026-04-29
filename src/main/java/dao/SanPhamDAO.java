@@ -187,4 +187,22 @@ public class SanPhamDAO {
         }
         return false;
     }
+    
+    public boolean deleteAllByMaSP(List<String> listMaSP) {
+        if (listMaSP == null || listMaSP.isEmpty()) return false;
+        String placeholders = String.join(",", listMaSP.stream().map(id -> "?").toArray(String[]::new));
+        String sql = "DELETE FROM SanPham WHERE ma IN (" + placeholders + ")";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            for (int i = 0; i < listMaSP.size(); i++) {
+                ps.setString(i + 1, listMaSP.get(i));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

@@ -14,24 +14,44 @@ import main.java.dto.ThongKeTongQuanDTO;
 import main.java.dto.TopSanPhamDTO;
 
 public class StatisticPanel extends JPanel {
+
+    // # Khởi tạo biến thành phần
     private JLabel lblRevenueToday, lblInvoicesToday, lblLowStock, lblRevenueMonth;
     private JTable tblRevenue, tblTopProducts;
     private DefaultTableModel modelRevenue, modelTopProducts;
     private JTextField txtStartDate, txtEndDate;
     private JButton btnFilter;
 
+    // # Constructor
     public StatisticPanel() {
+        setupPanel();
+        initComponents();
+        refreshData();
+    }
+    
+    // # Giao diện
+
+    /**
+     * Cấu hình cơ bản cho Panel
+     */
+    private void setupPanel() {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setBackground(Color.WHITE);
+    }
 
+    /**
+     * Khởi tạo các thành phần giao diện
+     */
+    private void initComponents() {
         initSummaryCards();
         initFilterSection();
         initTabbedTables();
-
-        refreshData();
     }
 
+    /**
+     * Khởi tạo các thẻ tóm tắt (Cards) ở trên cùng
+     */
     private void initSummaryCards() {
         JPanel pnlSummary = new JPanel(new GridLayout(1, 4, 15, 0));
         pnlSummary.setOpaque(false);
@@ -44,37 +64,16 @@ public class StatisticPanel extends JPanel {
         add(pnlSummary, BorderLayout.NORTH);
     }
 
-    private JPanel createCard(String title, String value, Color color) {
-        JPanel card = new JPanel(new BorderLayout());
-        card.setBackground(color);
-        card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        card.setPreferredSize(new Dimension(200, 100));
-
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setForeground(new Color(255, 255, 255, 200));
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        card.add(lblTitle, BorderLayout.NORTH);
-
-        JLabel lblValue = new JLabel(value);
-        lblValue.setForeground(Color.WHITE);
-        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        card.add(lblValue, BorderLayout.CENTER);
-
-        if (title.contains("DOANH THU HÔM NAY")) lblRevenueToday = lblValue;
-        else if (title.contains("HÓA ĐƠN HÔM NAY")) lblInvoicesToday = lblValue;
-        else if (title.contains("SẢN PHẨM SẮP HẾT")) lblLowStock = lblValue;
-        else if (title.contains("DOANH THU THÁNG")) lblRevenueMonth = lblValue;
-
-        return card;
-    }
-
+    /**
+     * Khởi tạo phần bộ lọc thời gian
+     */
     private void initFilterSection() {
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 10));
         pnlCenter.setOpaque(false);
 
         JPanel pnlFilter = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         pnlFilter.setOpaque(false);
-        pnlFilter.setBorder(BorderFactory.createTitledBorder("Bộ lọc thời gian"));
+        pnlFilter.setBorder(BorderFactory.createTitledBorder(" Bộ lọc thời gian "));
 
         pnlFilter.add(new JLabel("Từ ngày (yyyy-MM-dd):"));
         txtStartDate = new JTextField(LocalDate.now().minusDays(7).toString(), 10);
@@ -96,10 +95,14 @@ public class StatisticPanel extends JPanel {
         add(pnlCenter, BorderLayout.CENTER);
     }
 
+    /**
+     * Khởi tạo các bảng dữ liệu trong TabbedPane
+     */
     private void initTabbedTables() {
         JTabbedPane tabs = new JTabbedPane();
         tabs.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
+        // Tab Doanh thu
         String[] colRevenue = {"Ngày", "Số hóa đơn", "Doanh thu (VND)"};
         modelRevenue = new DefaultTableModel(colRevenue, 0) {
             @Override
@@ -109,6 +112,7 @@ public class StatisticPanel extends JPanel {
         setupTableStyle(tblRevenue);
         tabs.addTab("Doanh thu theo ngày", new JScrollPane(tblRevenue));
 
+        // Tab Top sản phẩm
         String[] colProducts = {"Mã SP", "Tên sản phẩm", "Số lượng bán", "Tổng tiền (VND)"};
         modelTopProducts = new DefaultTableModel(colProducts, 0) {
             @Override
@@ -122,20 +126,11 @@ public class StatisticPanel extends JPanel {
         pnlCenter.add(tabs, BorderLayout.CENTER);
     }
 
-    private void setupTableStyle(JTable table) {
-        table.setRowHeight(30);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(240, 240, 240));
-        
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
-        
-        if (table.getColumnCount() >= 3) {
-            table.getColumnModel().getColumn(table.getColumnCount() - 1).setCellRenderer(rightRenderer);
-        }
-    }
+    // # Tương tác dữ liệu
 
+    /**
+     * Làm mới dữ liệu thống kê từ database
+     */
     private void refreshData() {
         String startStr = txtStartDate.getText().trim();
         String endStr = txtEndDate.getText().trim();
@@ -188,9 +183,56 @@ public class StatisticPanel extends JPanel {
                         dto.getTenSP(),
                         dto.getSoLuongDaBan(),
                         String.format("%,.0f", dto.getTongTien())
-                    });
-                }
+                });
             }
-        }.execute();
+        }
+    }.execute();
+}
+
+    // # Utils
+
+    /**
+     * Tạo một thẻ
+     */
+    private JPanel createCard(String title, String value, Color color) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(color);
+        card.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        card.setPreferredSize(new Dimension(200, 100));
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setForeground(new Color(255, 255, 255, 200));
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        card.add(lblTitle, BorderLayout.NORTH);
+
+        JLabel lblValue = new JLabel(value);
+        lblValue.setForeground(Color.WHITE);
+        lblValue.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        card.add(lblValue, BorderLayout.CENTER);
+
+        if (title.contains("DOANH THU HÔM NAY")) lblRevenueToday = lblValue;
+        else if (title.contains("HÓA ĐƠN HÔM NAY")) lblInvoicesToday = lblValue;
+        else if (title.contains("SẢN PHẨM SẮP HẾT")) lblLowStock = lblValue;
+        else if (title.contains("DOANH THU THÁNG")) lblRevenueMonth = lblValue;
+
+        return card;
+    }
+
+    /**
+     * Thiết lập chung cho table
+     */
+    private void setupTableStyle(JTable table) {
+        table.setRowHeight(30);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(240, 240, 240));
+        
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        
+        if (table.getColumnCount() >= 3) {
+            table.getColumnModel().getColumn(table.getColumnCount() - 1).setCellRenderer(rightRenderer);
+        }
     }
 }
+

@@ -98,6 +98,30 @@ public class NhanVienDAO {
         return new PaginatedResponse<>(result, criteria.getPage(), criteria.getLimit() != null ? criteria.getLimit() : result.size(), totalItems);
     }
 
+    public Optional<NhanVien> getBySdt(String sdt) {
+        String sql = "SELECT * FROM NhanVien WHERE sdt = ?";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setString(1, sdt);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return Optional.of(new NhanVien(
+                    rs.getString("ma"),
+                    rs.getString("ten"),
+                    rs.getString("sdt"),
+                    rs.getString("matKhau"),
+                    rs.getString("anh"),
+                    LoaiNV.fromString(rs.getString("loai"))
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
     public Optional<NhanVien> getByMa(String ma) {
         String sql = "SELECT * FROM NhanVien WHERE ma = ?";
         try (
@@ -197,5 +221,23 @@ public class NhanVienDAO {
             e.printStackTrace();
         }
         return Optional.empty();
+    }
+    
+    public boolean deleteAllByMaNV(List<String> listMaNV) {
+        if (listMaNV == null || listMaNV.isEmpty()) return false;
+        String placeholders = String.join(",", listMaNV.stream().map(id -> "?").toArray(String[]::new));
+        String sql = "DELETE FROM NhanVien WHERE ma IN (" + placeholders + ")";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            for (int i = 0; i < listMaNV.size(); i++) {
+                ps.setString(i + 1, listMaNV.get(i));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

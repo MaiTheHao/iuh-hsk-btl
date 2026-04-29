@@ -27,4 +27,11 @@ public final class AppRegex {
      * - Cuối cùng là SDT khách hàng hoặc 'VL'
      */
     public static final Pattern MA_HOA_DON = Pattern.compile("^HD-[0-9]{14}-[A-Za-z0-9]+-([0-9]{10}|VL)$");
+
+    /**
+     * Regex cho họ tên:
+     * - Chỉ chứa chữ cái và khoảng trắng
+     * - Không chứa số và ký tự đặc biệt
+     */
+    public static final Pattern TEN = Pattern.compile("^[\\p{L}\\s]+$");
 }

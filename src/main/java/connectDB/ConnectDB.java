@@ -15,7 +15,6 @@ public class ConnectDB {
 
     static {
         try {
-            System.out.println(ConnectDB.class.getClassLoader());
             File xmlFile = new File(ConnectDB.class.getClassLoader().getResource("main/resources/env.xml").toURI());
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

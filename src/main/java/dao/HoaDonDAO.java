@@ -70,6 +70,24 @@ public class HoaDonDAO {
         return false;
     }
 
+    public boolean deleteAllByMaHD(List<String> listMaHD) {
+        if (listMaHD == null || listMaHD.isEmpty()) return false;
+        String placeholders = String.join(",", listMaHD.stream().map(id -> "?").toArray(String[]::new));
+        String sql = "DELETE FROM HoaDon WHERE ma IN (" + placeholders + ")";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            for (int i = 0; i < listMaHD.size(); i++) {
+                ps.setString(i + 1, listMaHD.get(i));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private HoaDon mapResultSetToEntity(ResultSet rs) throws SQLException {
         HoaDon hd = new HoaDon();
         hd.setMa(rs.getString("ma"));

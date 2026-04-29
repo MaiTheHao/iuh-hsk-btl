@@ -12,39 +12,61 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import main.java.dao.*;
 import main.java.entity.*;
 import main.java.enumeration.TrangThaiHD;
 import main.java.util.AppContext;
 import main.java.util.AppRegex;
+import main.java.util.ImageUtil;
+import main.java.util.AppColor;
 import main.java.dto.SanPhamGetListCriteria;
 import main.java.dto.LoaiSPGetListCriteria;
 import main.java.dto.PaginatedResponse;
 
 public class SalePanel extends JPanel {
+
+    // # Khởi tạo biến thành phần
     private JTable tblProducts, tblCart;
     private DefaultTableModel modelProducts, modelCart;
     private JTextField txtSearch, txtSdtKH, txtTenKH;
     private JComboBox<String> cbLoai;
     private JLabel lblTotal, lblVat, lblFinalTotal;
     
+    // ## Data Members
     private List<SanPham> currentProducts = new ArrayList<>();
     private List<ChiTietHD> cartItems = new ArrayList<>();
     private KhachHang selectedKH = null;
 
+    // # Constructor
     public SalePanel() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // Bố cục
-        initLeftPanel();
-        initRightPanel();
-        
-        // Dữ liệu
+        setupPanel();
+        initComponents();
         loadCategories();
         loadProducts();
     }
 
+    // # Giao diện
+
+    /**
+     * Cấu hình cơ bản cho Panel
+     */
+    private void setupPanel() {
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
+    /**
+     * Khởi tạo các thành phần giao diện
+     */
+    private void initComponents() {
+        initLeftPanel();
+        initRightPanel();
+    }
+
+    /**
+     * Khởi tạo phần bên trái: Danh sách sản phẩm
+     */
     private void initLeftPanel() {
         JPanel left = new JPanel(new BorderLayout(5, 5));
         left.setPreferredSize(new Dimension(800, 0));
@@ -87,8 +109,9 @@ public class SalePanel extends JPanel {
         tblProducts.setRowHeight(80);
         tblProducts.getColumnModel().getColumn(0).setPreferredWidth(80);
         tblProducts.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblProducts.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+        tblProducts.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
                 if (evt.getClickCount() == 2) {
                     addToCart();
                 }
@@ -96,10 +119,12 @@ public class SalePanel extends JPanel {
         });
         
         left.add(new JScrollPane(tblProducts), BorderLayout.CENTER);
-        
         add(left, BorderLayout.WEST);
     }
 
+    /**
+     * Khởi tạo phần bên phải: Giỏ hàng và Thanh toán
+     */
     private void initRightPanel() {
         JPanel right = new JPanel(new BorderLayout(5, 5));
         
@@ -189,7 +214,7 @@ public class SalePanel extends JPanel {
         payment.add(new JLabel("Tổng thanh toán:"));
         lblFinalTotal = new JLabel("0.0", JLabel.RIGHT);
         lblFinalTotal.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblFinalTotal.setForeground(new Color(231, 76, 60));
+        lblFinalTotal.setForeground(AppColor.ERROR);
         payment.add(lblFinalTotal);
 
         JButton btnClear = new JButton("Hủy đơn");
@@ -197,44 +222,35 @@ public class SalePanel extends JPanel {
         payment.add(btnClear);
 
         JButton btnPay = new JButton("THANH TOÁN");
-        btnPay.setBackground(new Color(46, 204, 113));
+        btnPay.setBackground(AppColor.SUCCESS);
         btnPay.setForeground(Color.WHITE);
         btnPay.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnPay.addActionListener(e -> checkout());
         payment.add(btnPay);
 
         JButton btnPrint = new JButton("IN HÓA ĐƠN");
-        btnPrint.setBackground(new Color(52, 152, 219));
+        btnPrint.setBackground(AppColor.INFO);
         btnPrint.setForeground(Color.WHITE);
         btnPrint.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnPrint.addActionListener(e -> {
-            if (cartItems.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng thêm sản phẩm vào giỏ hàng trước khi in!");
-                return;
-            }
-            JOptionPane.showMessageDialog(this, "Đang chuẩn bị kết nối máy in...\nChức năng xuất bản cứng đang được khởi tạo.");
-        });
+        btnPrint.addActionListener(e -> handlePrint());
         payment.add(btnPrint);
 
         JButton btnExport = new JButton("XUẤT PDF");
-        btnExport.setBackground(new Color(230, 126, 34));
+        btnExport.setBackground(AppColor.WARN);
         btnExport.setForeground(Color.WHITE);
         btnExport.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnExport.addActionListener(e -> {
-            if (cartItems.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng thêm sản phẩm vào giỏ hàng trước khi xuất!");
-                return;
-            }
-            JOptionPane.showMessageDialog(this, "Đang khởi tạo tệp PDF...\nĐường dẫn mặc định: ./exports/receipt.pdf");
-        });
+        btnExport.addActionListener(e -> handleExportPDF());
         payment.add(btnExport);
 
         right.add(payment, BorderLayout.SOUTH);
-
         add(right, BorderLayout.CENTER);
     }
 
-    // Dữ liệu
+    // # Tương tác dữ liệu
+
+    /**
+     * Tải danh sách loại sản phẩm lên ComboBox
+     */
     private void loadCategories() {
         List<LoaiSP> list = LoaiSPDAO.getInstance().getList(new LoaiSPGetListCriteria()).data();
         for (LoaiSP l : list) {
@@ -242,10 +258,14 @@ public class SalePanel extends JPanel {
         }
     }
 
+    /**
+     * Tải danh sách sản phẩm lên bảng (hỗ trợ tìm kiếm và lọc)
+     */
     private void loadProducts() {
         modelProducts.setRowCount(0);
         SanPhamGetListCriteria criteria = new SanPhamGetListCriteria();
         String selectedLoai = (String) cbLoai.getSelectedItem();
+        
         if (selectedLoai != null && !selectedLoai.equals("Tất cả")) {
             List<LoaiSP> loais = LoaiSPDAO.getInstance().getList(new LoaiSPGetListCriteria()).data();
             for (LoaiSP l : loais) {
@@ -269,7 +289,7 @@ public class SalePanel extends JPanel {
                     boolean matchMa = sp.getMa().toLowerCase().contains(search);
                     
                     if (search.isEmpty() || matchName || matchMa) {
-                        ImageIcon icon = createIcon(sp.getAnh());
+                        ImageIcon icon = ImageUtil.createIcon(sp.getAnh(), 70, 70);
                         publish(new Object[]{
                             icon, 
                             sp.getMa(), 
@@ -291,26 +311,11 @@ public class SalePanel extends JPanel {
         }.execute();
     }
 
-    private ImageIcon createIcon(String path) {
-        if (path == null || path.isEmpty()) return null;
-        try {
-            Image img;
-            if (path.startsWith("http")) {
-                img = javax.imageio.ImageIO.read(new java.net.URL(path));
-            } else {
-                java.net.URL imgURL = getClass().getResource(path);
-                img = (imgURL != null) ? new ImageIcon(imgURL).getImage() : new ImageIcon(path).getImage();
-            }
-            
-            if (img != null) {
-                return new ImageIcon(img.getScaledInstance(70, 70, Image.SCALE_SMOOTH));
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
+    // ## Event Handlers & Business Logic
 
-    // Nghiệp vụ
+    /**
+     * Tìm kiếm khách hàng theo số điện thoại
+     */
     private void findCustomer() {
         String sdt = txtSdtKH.getText().trim();
         if (sdt.isEmpty()) {
@@ -340,6 +345,9 @@ public class SalePanel extends JPanel {
         }
     }
 
+    /**
+     * Thêm sản phẩm được chọn vào giỏ hàng
+     */
     private void addToCart() {
         int row = tblProducts.getSelectedRow();
         if (row < 0) return;
@@ -369,6 +377,9 @@ public class SalePanel extends JPanel {
         refreshCartTable();
     }
 
+    /**
+     * Cập nhật số lượng của một mục trong giỏ hàng
+     */
     private void updateCartQuantity(int row) {
         if (row < 0 || row >= cartItems.size()) return;
         ChiTietHD ct = cartItems.get(row);
@@ -391,6 +402,9 @@ public class SalePanel extends JPanel {
         refreshCartTable();
     }
 
+    /**
+     * Làm mới bảng giỏ hàng và tính toán lại tổng tiền
+     */
     private void refreshCartTable() {
         modelCart.setRowCount(0);
         double total = 0;
@@ -413,6 +427,9 @@ public class SalePanel extends JPanel {
         lblFinalTotal.setText(String.format("%,.0f VND", finalTotal));
     }
 
+    /**
+     * Hủy đơn hàng hiện tại
+     */
     private void clearCart() {
         cartItems.clear();
         selectedKH = null;
@@ -421,6 +438,9 @@ public class SalePanel extends JPanel {
         refreshCartTable();
     }
 
+    /**
+     * Thực hiện thanh toán và lưu hóa đơn
+     */
     private void checkout() {
         if (cartItems.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Giỏ hàng trống!");
@@ -457,5 +477,29 @@ public class SalePanel extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Lỗi khi lưu hóa đơn!");
         }
+    }
+
+    // # Utils
+
+    /**
+     * Xử lý in hóa đơn (Mockup)
+     */
+    private void handlePrint() {
+        if (cartItems.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng thêm sản phẩm vào giỏ hàng trước khi in!");
+            return;
+        }
+        JOptionPane.showMessageDialog(this, "Đang chuẩn bị kết nối máy in...\nChức năng xuất bản cứng đang được khởi tạo.");
+    }
+
+    /**
+     * Xử lý xuất hóa đơn PDF (Mockup)
+     */
+    private void handleExportPDF() {
+        if (cartItems.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng thêm sản phẩm vào giỏ hàng trước khi xuất!");
+            return;
+        }
+        JOptionPane.showMessageDialog(this, "Đang khởi tạo tệp PDF...\nĐường dẫn mặc định: ./exports/receipt.pdf");
     }
 }

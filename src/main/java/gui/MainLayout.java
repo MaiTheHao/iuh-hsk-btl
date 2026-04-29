@@ -60,9 +60,10 @@ public class MainLayout extends JPanel {
         createTab(tabs, "Bán hàng", new SalePanel());
 
         if (AppContext.getInstance().isAdmin()) {
-            createTab(tabs, "Sản phẩm", createPlaceholder("Quản lý danh sách Sản phẩm"));
-            createTab(tabs, "Nhân viên", createPlaceholder("Quản lý danh sách Nhân viên"));
-            createTab(tabs, "Hóa đơn", createPlaceholder("Lịch sử giao dịch & Hóa đơn"));
+            createTab(tabs, "Sản phẩm", new ProductPanel());
+            createTab(tabs, "Loại sản phẩm", new ProductTypePanel());
+            createTab(tabs, "Nhân viên", new EmployeePanel());
+            createTab(tabs, "Hóa đơn", new InvoicePanel());
         }
 
         createTab(tabs, "Thống kê", new StatisticPanel());

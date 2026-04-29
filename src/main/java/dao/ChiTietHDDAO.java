@@ -51,6 +51,24 @@ public class ChiTietHDDAO {
         return false;
     }
 
+    public boolean deleteAllByMaHD(List<String> listMaHD) {
+        if (listMaHD == null || listMaHD.isEmpty()) return false;
+        String placeholders = String.join(",", listMaHD.stream().map(id -> "?").toArray(String[]::new));
+        String sql = "DELETE FROM ChiTietHD WHERE maHD IN (" + placeholders + ")";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            for (int i = 0; i < listMaHD.size(); i++) {
+                ps.setString(i + 1, listMaHD.get(i));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private ChiTietHD mapResultSetToEntity(ResultSet rs) throws SQLException {
         ChiTietHD ct = new ChiTietHD();
         ct.setHoaDon(new HoaDon(rs.getString("maHD")));

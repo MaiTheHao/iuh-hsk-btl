@@ -8,6 +8,7 @@ import main.java.entity.NhanVien;
 import main.java.App;
 import main.java.util.AppContext;
 import main.java.util.AppRegex;
+import main.java.util.AppColor;
 import java.util.Optional;
 
 public class Login extends JPanel {
@@ -19,11 +20,11 @@ public class Login extends JPanel {
     public Login(App mainFrame) {
         this.mainFrame = mainFrame;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(new Color(245, 246, 250));
+        setBackground(AppColor.BACKGROUND);
 
         JPanel horizontalCenter = new JPanel();
         horizontalCenter.setLayout(new BoxLayout(horizontalCenter, BoxLayout.X_AXIS));
-        horizontalCenter.setBackground(new Color(245, 246, 250));
+        horizontalCenter.setBackground(AppColor.BACKGROUND);
 
         JPanel loginCard = new JPanel();
         loginCard.setLayout(new BoxLayout(loginCard, BoxLayout.Y_AXIS));
@@ -84,7 +85,7 @@ public class Login extends JPanel {
         btnLogin.setPreferredSize(new Dimension(300, 45));
         btnLogin.setMaximumSize(new Dimension(320, 45));
         btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnLogin.setBackground(new Color(55, 66, 250));
+        btnLogin.setBackground(AppColor.PRIMARY);
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setFocusPainted(false);
         btnLogin.setBorderPainted(false);

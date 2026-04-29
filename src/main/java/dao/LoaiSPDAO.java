@@ -101,4 +101,22 @@ public class LoaiSPDAO {
   public boolean delete(String ma) {
     return false;
   }
+
+  public boolean deleteAllByMaLoai(List<String> listMaLoai) {
+    if (listMaLoai == null || listMaLoai.isEmpty()) return false;
+    String placeholders = String.join(",", listMaLoai.stream().map(id -> "?").toArray(String[]::new));
+    String sql = "DELETE FROM LoaiSP WHERE ma IN (" + placeholders + ")";
+    try (
+        Connection conn = ConnectDB.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+    ) {
+        for (int i = 0; i < listMaLoai.size(); i++) {
+            ps.setString(i + 1, listMaLoai.get(i));
+        }
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+  }
 }

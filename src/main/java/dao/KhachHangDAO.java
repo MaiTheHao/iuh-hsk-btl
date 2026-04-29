@@ -153,4 +153,22 @@ public class KhachHangDAO {
         }
         return false;
     }
+
+    public boolean deleteAllBySdtKH(List<String> listSdtKH) {
+        if (listSdtKH == null || listSdtKH.isEmpty()) return false;
+        String placeholders = String.join(",", listSdtKH.stream().map(id -> "?").toArray(String[]::new));
+        String sql = "DELETE FROM KhachHang WHERE sdt IN (" + placeholders + ")";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            for (int i = 0; i < listSdtKH.size(); i++) {
+                ps.setString(i + 1, listSdtKH.get(i));
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
