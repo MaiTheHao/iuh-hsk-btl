@@ -3,12 +3,12 @@ package main.java;
 import javax.swing.*;
 import java.awt.*;
 import main.java.gui.Login;
-import main.java.gui.MainDashboard;
+import main.java.gui.MainLayout;
 
 public class App extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
-    private MainDashboard mainDashboard;
+    private MainLayout mainDashboard;
 
     public App() {
         // Khung ứng dụng
@@ -25,7 +25,7 @@ public class App extends JFrame {
         Login loginPanel = new Login(this);
         mainContainer.add(loginPanel, "LOGIN_PAGE");
 
-        this.mainDashboard = new MainDashboard(this);
+        this.mainDashboard = new MainLayout(this);
         mainContainer.add(mainDashboard, "MAIN_PAGE");
 
         add(mainContainer);

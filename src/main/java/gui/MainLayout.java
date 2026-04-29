@@ -7,10 +7,10 @@ import main.java.util.AppContext;
 import main.java.entity.NhanVien;
 import main.java.App;
 
-public class MainDashboard extends JPanel {
+public class MainLayout extends JPanel {
     private App mainFrame;
     
-    public MainDashboard(App mainFrame) {
+    public MainLayout(App mainFrame) {
         this.mainFrame = mainFrame;
         setLayout(new BorderLayout());
     }
@@ -57,23 +57,32 @@ public class MainDashboard extends JPanel {
         tabs.setFont(new Font("Segoe UI", Font.BOLD, 16));
         tabs.setFocusable(false);
 
-        // Thêm khoảng trống và định dạng cho tab to hơn
-        String tabStyle = "<html><body style='width: 120px; padding: 10px 5px;'>";
-        
-        tabs.addTab(tabStyle + "Bán hàng</body></html>", new SalePanel());
+        createTab(tabs, "Bán hàng", new SalePanel());
 
         if (AppContext.getInstance().isAdmin()) {
-            tabs.addTab(tabStyle + "Sản phẩm</body></html>", createPlaceholder("Quản lý danh sách Sản phẩm"));
-            tabs.addTab(tabStyle + "Nhân viên</body></html>", createPlaceholder("Quản lý danh sách Nhân viên"));
-            tabs.addTab(tabStyle + "Hóa đơn</body></html>", createPlaceholder("Lịch sử giao dịch & Hóa đơn"));
+            createTab(tabs, "Sản phẩm", createPlaceholder("Quản lý danh sách Sản phẩm"));
+            createTab(tabs, "Nhân viên", createPlaceholder("Quản lý danh sách Nhân viên"));
+            createTab(tabs, "Hóa đơn", createPlaceholder("Lịch sử giao dịch & Hóa đơn"));
         }
 
-        tabs.addTab(tabStyle + "Thống kê</body></html>", createPlaceholder("Báo cáo doanh thu & Kho"));
+        createTab(tabs, "Thống kê", new StatisticPanel());
 
         add(tabs, BorderLayout.CENTER);
 
         revalidate();
         repaint();
+    }
+
+    private void createTab(JTabbedPane tabs, String title, JPanel content) {
+        int index = tabs.getTabCount();
+        tabs.addTab(null, content);
+        
+        JLabel lbl = new JLabel(title, SwingConstants.CENTER);
+        lbl.setPreferredSize(new Dimension(130, 50));
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lbl.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+        
+        tabs.setTabComponentAt(index, lbl);
     }
 
     private JPanel createPlaceholder(String title) {
