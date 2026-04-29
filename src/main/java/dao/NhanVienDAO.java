@@ -22,6 +22,7 @@ public class NhanVienDAO {
     }
 
     public PaginatedResponse<NhanVien> getList(NhanVienGetListCriteria criteria) {
+        if (criteria == null) criteria = new NhanVienGetListCriteria();
         List<NhanVien> result = new ArrayList<>();
 
         StringBuilder whereQuery = new StringBuilder();
