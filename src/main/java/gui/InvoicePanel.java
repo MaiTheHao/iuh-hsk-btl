@@ -3,6 +3,9 @@ package main.java.gui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,37 +15,17 @@ import main.java.entity.HoaDon;
 import main.java.entity.ChiTietHD;
 import main.java.util.AppColor;
 
-/**
- * GUIDE CHO DEVELOPER:
- * 1. Trang này quản lý Lịch sử hóa đơn.
- * 2. Cần kết hợp HoaDonDAO (lấy danh sách HD) và ChiTietHDDAO (lấy chi tiết khi click vào 1 HD).
- * 3. Luồng nghiệp vụ:
- *    - Xem danh sách hóa đơn ở bảng trên/trái.
- *    - Khi chọn 1 dòng, bảng dưới/phải sẽ load các món đã mua trong hóa đơn đó.
- *    - Chức năng CRUD: Chủ yếu là READ và DELETE (Hủy hóa đơn). Thường không cho phép SỬA hóa đơn đã xuất.
- * 
- * ## QUY TẮC LAYOUT (QUAN TRỌNG):
- * - NGHIÊM CẤM sử dụng GridBagLayout.
- * - Hãy sử dụng BorderLayout kết hợp JSplitPane để chia không gian hiển thị danh sách và chi tiết.
- * 
- * ## TÀI LIỆU THAM KHẢO:
- * - Hãy đọc kỹ file EmployeePanel.java để học cách xử lý bảng (Table) và 
- *   file SalePanel.java để học cách hiển thị giỏ hàng/chi tiết hóa đơn.
- * 
- * ## CÁCH DÙNG UTILS (Đọc kỹ các file này trong package main.java.util):
- * - AppColor: Hiển thị trạng thái hóa đơn (ví dụ: PAID là màu SUCCESS).
- * - AppContext: Lấy thông tin nhân viên để lọc hóa đơn do chính mình lập nếu cần.
- */
 public class InvoicePanel extends JPanel {
 
     // # Khởi tạo biến thành phần
     private JTable tblInvoices, tblDetails;
     private DefaultTableModel modelInvoices, modelDetails;
-    private JTextField txtSearch; // Tìm theo Mã HD hoặc SĐT Khách
+    private JTextField txtSearch;
     private JButton btnDelete, btnRefresh;
 
     // ## Data Members
     private List<HoaDon> currentInvoices = new ArrayList<>();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // # Constructor
     public InvoicePanel() {
@@ -59,52 +42,127 @@ public class InvoicePanel extends JPanel {
     }
 
     private void initComponents() {
-        /**
-         * TODO: 
-         * - Phía trên: Thanh tìm kiếm và các nút Refresh, Hủy hóa đơn.
-         * - Phía dưới: Dùng JSplitPane (Vertical) để chia làm 2 phần:
-         *   + Phần trên: Bảng tblInvoices (Mã HD, Ngày lập, Nhân viên, Khách hàng, Tổng tiền, VAT).
-         *   + Phần dưới: Bảng tblDetails (Tên SP, Đơn giá, Số lượng, Thành tiền).
-         */
-        
+        // --- THANH CÔNG CỤ (TÌM KIẾM) ---
+        JPanel toolBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        toolBar.setOpaque(false);
+        toolBar.add(new JLabel("Tìm kiếm (Mã HD/SĐT Khách):"));
+        txtSearch = new JTextField(20);
+        txtSearch.addActionListener(e -> loadInvoices());
+        toolBar.add(txtSearch);
+
+        btnRefresh = new JButton("Làm mới");
+        btnRefresh.setBackground(AppColor.INFO);
+        btnRefresh.setForeground(Color.WHITE);
+        toolBar.add(btnRefresh);
+
+        btnDelete = new JButton("Hủy hóa đơn");
+        btnDelete.setBackground(AppColor.ERROR);
+        btnDelete.setForeground(Color.WHITE);
+        toolBar.add(btnDelete);
+
+        add(toolBar, BorderLayout.NORTH);
+
+        // --- NỘI DUNG CHÍNH (SPLIT PANE) ---
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setDividerLocation(350);
+        splitPane.setResizeWeight(0.5);
+
+        // Bảng hóa đơn
+        modelInvoices = new DefaultTableModel(new String[]{"Mã hóa đơn", "Ngày lập", "Nhân viên", "Khách hàng", "Tổng tiền", "VAT"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tblInvoices = new JTable(modelInvoices);
+        tblInvoices.setRowHeight(30);
+        tblInvoices.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = tblInvoices.getSelectedRow();
+                if (row >= 0) InvoicePanel.this.loadDetails(currentInvoices.get(row).getMa());
+            }
+        });
+        JPanel pnlInvoices = new JPanel(new BorderLayout());
+        pnlInvoices.setBorder(BorderFactory.createTitledBorder(" Danh sách hóa đơn "));
+        pnlInvoices.add(new JScrollPane(tblInvoices), BorderLayout.CENTER);
+        splitPane.setTopComponent(pnlInvoices);
+
+        // Bảng chi tiết
+        modelDetails = new DefaultTableModel(new String[]{"STT", "Tên sản phẩm", "Đơn giá", "Số lượng", "Thành tiền"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tblDetails = new JTable(modelDetails);
+        tblDetails.setRowHeight(30);
+        JPanel pnlDetails = new JPanel(new BorderLayout());
+        pnlDetails.setBorder(BorderFactory.createTitledBorder(" Chi tiết hóa đơn "));
+        pnlDetails.add(new JScrollPane(tblDetails), BorderLayout.CENTER);
+        splitPane.setBottomComponent(pnlDetails);
+
+        add(splitPane, BorderLayout.CENTER);
+
         bindEvents();
     }
 
     private void bindEvents() {
-        /**
-         * GUIDE:
-         * - tblInvoices.addMouseListener: Khi click dòng nào thì gọi loadDetails(maHD).
-         * - btnDelete: Hủy hóa đơn được chọn (Cần hỏi xác nhận).
-         */
+        btnRefresh.addActionListener(e -> {
+            txtSearch.setText("");
+            loadInvoices();
+            modelDetails.setRowCount(0);
+        });
+        btnDelete.addActionListener(e -> handleDelete());
     }
 
     // # Tương tác dữ liệu
     private void loadInvoices() {
-        /**
-         * GUIDE:
-         * - Gọi HoaDonDAO.getInstance().getList(...)
-         * - Đổ dữ liệu vào modelInvoices.
-         */
+        modelInvoices.setRowCount(0);
+        main.java.dto.HoaDonGetListCriteria criteria = new main.java.dto.HoaDonGetListCriteria();
+        criteria.setTuKhoa(txtSearch.getText().trim());
+        
+        currentInvoices = HoaDonDAO.getInstance().getList(criteria).data();
+        
+        for (HoaDon hd : currentInvoices) {
+            modelInvoices.addRow(new Object[]{
+                hd.getMa(),
+                hd.getNgayLap().format(formatter),
+                hd.getNhanVien() != null ? hd.getNhanVien().getTen() : "N/A",
+                hd.getKhachHang() != null ? hd.getKhachHang().getTen() : "Khách vãng lai",
+                String.format("%,.0f", hd.getTongTien()),
+                String.format("%,.0f", hd.getVat())
+            });
+        }
     }
 
     private void loadDetails(String maHD) {
-        /**
-         * GUIDE:
-         * - Gọi ChiTietHDDAO.getInstance().getListByMaHD(maHD).
-         * - Xóa modelDetails cũ và đổ dữ liệu mới vào.
-         */
+        modelDetails.setRowCount(0);
+        List<ChiTietHD> details = ChiTietHDDAO.getInstance().getByMaHD(maHD);
+        int stt = 1;
+        for (ChiTietHD ct : details) {
+            modelDetails.addRow(new Object[]{
+                stt++,
+                ct.getSanPham().getTen(),
+                String.format("%,.0f", ct.getDonGia()),
+                ct.getSoLuong(),
+                String.format("%,.0f", ct.getThanhTien())
+            });
+        }
     }
 
     // # Event Handlers
     private void handleDelete() {
-        /**
-         * GUIDE:
-         * - Kiểm tra xem có dòng nào được chọn không.
-         * - Gọi HoaDonDAO.getInstance().delete(maHD).
-         * - Lưu ý: Khi xóa hóa đơn, cần cân nhắc việc hoàn lại số lượng tồn kho cho sản phẩm (nếu nghiệp vụ yêu cầu).
-         */
-    }
+        int row = tblInvoices.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hóa đơn để hủy!");
+            return;
+        }
 
-    // # Utils
-    // Các hàm phụ trợ nếu cần
+        String ma = (String) modelInvoices.getValueAt(row, 0);
+        if (JOptionPane.showConfirmDialog(this, "Hủy hóa đơn " + ma + "? Chức năng này không thể hoàn tác!", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            // Lưu ý: Logic DAO delete invoice có thể cần xử lý hoàn trả tồn kho nếu nghiệp vụ yêu cầu
+            if (HoaDonDAO.getInstance().delete(ma)) {
+                JOptionPane.showMessageDialog(this, "Đã hủy hóa đơn thành công!");
+                loadInvoices();
+                modelDetails.setRowCount(0);
+            }
+        }
+    }
 }

@@ -85,14 +85,4 @@ public class MainLayout extends JPanel {
         
         tabs.setTabComponentAt(index, lbl);
     }
-
-    private JPanel createPlaceholder(String title) {
-        JPanel p = new JPanel(new GridBagLayout());
-        p.setBackground(Color.WHITE);
-        JLabel lbl = new JLabel(title);
-        lbl.setFont(new Font("Segoe UI", Font.ITALIC, 20));
-        lbl.setForeground(Color.LIGHT_GRAY);
-        p.add(lbl);
-        return p;
-    }
 }
