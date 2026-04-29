@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import main.java.connectDB.ConnectDB;
+import main.java.dto.HoaDonGetListCriteria;
+import main.java.dto.PaginatedResponse;
 import main.java.entity.HoaDon;
 import main.java.entity.KhachHang;
 import main.java.entity.NhanVien;
@@ -19,6 +21,87 @@ public class HoaDonDAO {
 
     public static HoaDonDAO getInstance() {
         return instance;
+    }
+
+    public PaginatedResponse<HoaDon> getList(HoaDonGetListCriteria criteria) {
+        List<HoaDon> result = new ArrayList<>();
+        StringBuilder whereQuery = new StringBuilder();
+
+        if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isBlank()) {
+            whereQuery.append("AND (ma LIKE ? OR sdtKH LIKE ?) ");
+        }
+        if (criteria.getTuNgay() != null) {
+            whereQuery.append("AND ngayLap >= ? ");
+        }
+        if (criteria.getDenNgay() != null) {
+            whereQuery.append("AND ngayLap <= ? ");
+        }
+        if (criteria.getMaNhanVien() != null && !criteria.getMaNhanVien().isBlank()) {
+            whereQuery.append("AND maNV = ? ");
+        }
+        if (criteria.getSdtKhachHang() != null && !criteria.getSdtKhachHang().isBlank()) {
+            whereQuery.append("AND sdtKH = ? ");
+        }
+        if (criteria.getTrangThai() != null) {
+            whereQuery.append("AND trangThai = ? ");
+        }
+
+        long totalItems = 0;
+        try (Connection conn = ConnectDB.getConnection()) {
+            String countSql = "SELECT COUNT(*) FROM HoaDon WHERE 1=1 " + whereQuery;
+            try (PreparedStatement psCount = conn.prepareStatement(countSql)) {
+                int pIndex = 1;
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isBlank()) {
+                    String pattern = "%" + criteria.getTuKhoa() + "%";
+                    psCount.setString(pIndex++, pattern);
+                    psCount.setString(pIndex++, pattern);
+                }
+                if (criteria.getTuNgay() != null) psCount.setTimestamp(pIndex++, Timestamp.valueOf(criteria.getTuNgay()));
+                if (criteria.getDenNgay() != null) psCount.setTimestamp(pIndex++, Timestamp.valueOf(criteria.getDenNgay()));
+                if (criteria.getMaNhanVien() != null && !criteria.getMaNhanVien().isBlank()) psCount.setString(pIndex++, criteria.getMaNhanVien());
+                if (criteria.getSdtKhachHang() != null && !criteria.getSdtKhachHang().isBlank()) psCount.setString(pIndex++, criteria.getSdtKhachHang());
+                if (criteria.getTrangThai() != null) psCount.setString(pIndex++, criteria.getTrangThai().name());
+
+                ResultSet rsCount = psCount.executeQuery();
+                if (rsCount.next()) totalItems = rsCount.getLong(1);
+            }
+
+            StringBuilder sql = new StringBuilder("SELECT * FROM HoaDon WHERE 1=1 ");
+            sql.append(whereQuery);
+            sql.append("ORDER BY ngayLap DESC ");
+
+            if (criteria.isPaginate()) {
+                sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+            }
+
+            try (PreparedStatement psData = conn.prepareStatement(sql.toString())) {
+                int pIndex = 1;
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isBlank()) {
+                    String pattern = "%" + criteria.getTuKhoa() + "%";
+                    psData.setString(pIndex++, pattern);
+                    psData.setString(pIndex++, pattern);
+                }
+                if (criteria.getTuNgay() != null) psData.setTimestamp(pIndex++, Timestamp.valueOf(criteria.getTuNgay()));
+                if (criteria.getDenNgay() != null) psData.setTimestamp(pIndex++, Timestamp.valueOf(criteria.getDenNgay()));
+                if (criteria.getMaNhanVien() != null && !criteria.getMaNhanVien().isBlank()) psData.setString(pIndex++, criteria.getMaNhanVien());
+                if (criteria.getSdtKhachHang() != null && !criteria.getSdtKhachHang().isBlank()) psData.setString(pIndex++, criteria.getSdtKhachHang());
+                if (criteria.getTrangThai() != null) psData.setString(pIndex++, criteria.getTrangThai().name());
+
+                if (criteria.isPaginate()) {
+                    psData.setInt(pIndex++, criteria.getOffset());
+                    psData.setInt(pIndex++, criteria.getLimit());
+                }
+
+                ResultSet rs = psData.executeQuery();
+                while (rs.next()) {
+                    result.add(mapResultSetToEntity(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return new PaginatedResponse<>(result, criteria.getPage(), criteria.getLimit() != null ? criteria.getLimit() : result.size(), totalItems);
     }
 
     public List<HoaDon> getAll() {
@@ -63,6 +146,18 @@ public class HoaDonDAO {
             ps.setDouble(5, hd.getTongTien());
             ps.setDouble(6, hd.getVat());
             ps.setString(7, hd.getTrangThai() != null ? hd.getTrangThai().name() : TrangThaiHD.PAID.name());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean delete(String ma) {
+        String sql = "DELETE FROM HoaDon WHERE ma = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, ma);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

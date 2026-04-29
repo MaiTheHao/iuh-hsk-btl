@@ -4,12 +4,21 @@ import main.java.enumeration.SortDirection;
 
 public class SanPhamGetListCriteria extends BaseGetListCriteria {
     private String maLoai;
+    private String tuKhoa;
     private Double giaTu;
     private Double giaDen;
     private SortDirection sapXepMa = SortDirection.NONE;
     private SortDirection sapXepGia = SortDirection.NONE;
 
     public SanPhamGetListCriteria() {
+    }
+
+    public String getTuKhoa() {
+        return tuKhoa;
+    }
+
+    public void setTuKhoa(String tuKhoa) {
+        this.tuKhoa = tuKhoa;
     }
 
     public SanPhamGetListCriteria(String maLoai, Double giaTu, Double giaDen, SortDirection sapXepMa, SortDirection sapXepGia, Integer limit, Integer page) {
