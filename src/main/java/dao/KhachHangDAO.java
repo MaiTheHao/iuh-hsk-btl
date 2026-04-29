@@ -21,6 +21,7 @@ public class KhachHangDAO {
     }
 
     public PaginatedResponse<KhachHang> getList(KhachHangGetListCriteria criteria) {
+        if (criteria == null) criteria = new KhachHangGetListCriteria();
         List<KhachHang> result = new ArrayList<>();
         
         StringBuilder whereQuery = new StringBuilder();
@@ -77,11 +78,7 @@ public class KhachHangDAO {
 
                 ResultSet rs = psData.executeQuery();
                 while (rs.next()) {
-                    result.add(new KhachHang(
-                        rs.getString("sdt"),
-                        rs.getString("ten"),
-                        rs.getInt("diem")
-                    ));
+                    result.add(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -100,7 +97,7 @@ public class KhachHangDAO {
             ps.setString(1, sdt);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(new KhachHang(rs.getString("sdt"), rs.getString("ten"), rs.getInt("diem")));
+                return Optional.of(rsToEntity(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +129,7 @@ public class KhachHangDAO {
         ) {
             ps.setString(1, kh.getTen());
             ps.setInt(2, kh.getDiem());
-            ps.setString(3, kh.getSdt());
+            ps.setString(3, kh.getSdt().trim());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,7 +151,7 @@ public class KhachHangDAO {
         return false;
     }
 
-    public boolean deleteAllBySdtKH(List<String> listSdtKH) {
+    public boolean deleteAllBySdtKH(List<String> listSdtKH) throws SQLException {
         if (listSdtKH == null || listSdtKH.isEmpty()) return false;
         String placeholders = String.join(",", listSdtKH.stream().map(id -> "?").toArray(String[]::new));
         String sql = "DELETE FROM KhachHang WHERE sdt IN (" + placeholders + ")";
@@ -166,9 +163,14 @@ public class KhachHangDAO {
                 ps.setString(i + 1, listSdtKH.get(i));
             }
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false;
+    }
+    
+    private KhachHang rsToEntity(ResultSet rs) throws SQLException {
+        return new KhachHang(
+            rs.getString("sdt"),
+            rs.getString("ten"),
+            rs.getInt("diem")
+        );
     }
 }

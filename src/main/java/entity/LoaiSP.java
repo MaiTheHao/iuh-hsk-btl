@@ -56,4 +56,9 @@ public class LoaiSP {
     public int hashCode() {
         return Objects.hash(ma);
     }
+
+    @Override
+    public String toString() {
+        return ten;
+    }
 }

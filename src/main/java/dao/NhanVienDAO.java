@@ -8,7 +8,6 @@ import main.java.connectDB.ConnectDB;
 import main.java.dto.NhanVienGetListCriteria;
 import main.java.dto.PaginatedResponse;
 import main.java.entity.NhanVien;
-import main.java.enumeration.LoaiNV;
 import main.java.enumeration.SortDirection;
 
 public class NhanVienDAO {
@@ -22,6 +21,7 @@ public class NhanVienDAO {
     }
 
     public PaginatedResponse<NhanVien> getList(NhanVienGetListCriteria criteria) {
+        if (criteria == null) criteria = new NhanVienGetListCriteria();
         List<NhanVien> result = new ArrayList<>();
 
         StringBuilder whereQuery = new StringBuilder();
@@ -81,14 +81,7 @@ public class NhanVienDAO {
 
                 ResultSet rs = psData.executeQuery();
                 while (rs.next()) {
-                    result.add(new NhanVien(
-                        rs.getString("ma"),
-                        rs.getString("ten"),
-                        rs.getString("sdt"),
-                        rs.getString("matKhau"),
-                        rs.getString("anh"),
-                        LoaiNV.fromString(rs.getString("loai"))
-                    ));
+                    result.add(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -107,14 +100,7 @@ public class NhanVienDAO {
             ps.setString(1, sdt);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(new NhanVien(
-                    rs.getString("ma"),
-                    rs.getString("ten"),
-                    rs.getString("sdt"),
-                    rs.getString("matKhau"),
-                    rs.getString("anh"),
-                    LoaiNV.fromString(rs.getString("loai"))
-                ));
+                return Optional.of(rsToEntity(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,14 +117,7 @@ public class NhanVienDAO {
             ps.setString(1, ma);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(new NhanVien(
-                    rs.getString("ma"),
-                    rs.getString("ten"),
-                    rs.getString("sdt"),
-                    rs.getString("matKhau"),
-                    rs.getString("anh"),
-                    LoaiNV.fromString(rs.getString("loai"))
-                ));
+                return Optional.of(rsToEntity(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -208,14 +187,7 @@ public class NhanVienDAO {
             ps.setString(2, matKhau);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(new NhanVien(
-                    rs.getString("ma"),
-                    rs.getString("ten"),
-                    rs.getString("sdt"),
-                    rs.getString("matKhau"),
-                    rs.getString("anh"),
-                    LoaiNV.fromString(rs.getString("loai"))
-                ));
+                return Optional.of(rsToEntity(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -239,5 +211,16 @@ public class NhanVienDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private NhanVien rsToEntity(ResultSet rs) throws SQLException {
+        return new NhanVien(
+            rs.getString("ma"),
+            rs.getString("ten"),
+            rs.getString("sdt"),
+            rs.getString("matKhau"),
+            rs.getString("anh"),
+            main.java.enumeration.LoaiNV.fromString(rs.getString("loai"))
+        );
     }
 }

@@ -1,15 +1,34 @@
 package main.java.dto;
 
 import main.java.enumeration.SortDirection;
+import main.java.enumeration.TrangThaiSP;
 
 public class SanPhamGetListCriteria extends BaseGetListCriteria {
     private String maLoai;
+    private String tuKhoa;
     private Double giaTu;
     private Double giaDen;
     private SortDirection sapXepMa = SortDirection.NONE;
     private SortDirection sapXepGia = SortDirection.NONE;
+    private TrangThaiSP trangThai;
 
     public SanPhamGetListCriteria() {
+    }
+
+    public TrangThaiSP getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(TrangThaiSP trangThai) {
+        this.trangThai = trangThai;
+    }
+
+    public String getTuKhoa() {
+        return tuKhoa;
+    }
+
+    public void setTuKhoa(String tuKhoa) {
+        this.tuKhoa = tuKhoa;
     }
 
     public SanPhamGetListCriteria(String maLoai, Double giaTu, Double giaDen, SortDirection sapXepMa, SortDirection sapXepGia, Integer limit, Integer page) {

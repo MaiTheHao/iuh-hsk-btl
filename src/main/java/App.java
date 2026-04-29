@@ -2,7 +2,7 @@ package main.java;
 
 import javax.swing.*;
 import java.awt.*;
-import main.java.gui.Login;
+import main.java.gui.DangNhap;
 import main.java.gui.MainLayout;
 
 public class App extends JFrame {
@@ -22,7 +22,7 @@ public class App extends JFrame {
         mainContainer = new JPanel(cardLayout);
 
         // Danh sách trang
-        Login loginPanel = new Login(this);
+        DangNhap loginPanel = new DangNhap(this);
         mainContainer.add(loginPanel, "LOGIN_PAGE");
 
         this.mainDashboard = new MainLayout(this);
