@@ -60,11 +60,7 @@ public class LoaiSPDAO {
 
         ResultSet rs = psData.executeQuery();
         while (rs.next()) {
-          result.add(new LoaiSP(
-            rs.getString("ma"),
-            rs.getString("ten"),
-            rs.getString("moTa")
-          ));
+          result.add(rsToEntity(rs));
         }
       }
     } catch (Exception e) {
@@ -83,7 +79,7 @@ public class LoaiSPDAO {
       ps.setString(1, ma);
       ResultSet rs = ps.executeQuery();
       if (rs.next()) {
-        return Optional.of(new LoaiSP(rs.getString("ma"), rs.getString("ten"), rs.getString("moTa")));
+        return Optional.of(rsToEntity(rs));
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -119,5 +115,13 @@ public class LoaiSPDAO {
         e.printStackTrace();
     }
     return false;
+  }
+
+  private LoaiSP rsToEntity(ResultSet rs) throws SQLException {
+    return new LoaiSP(
+      rs.getString("ma"),
+      rs.getString("ten"),
+      rs.getString("moTa")
+    );
   }
 }

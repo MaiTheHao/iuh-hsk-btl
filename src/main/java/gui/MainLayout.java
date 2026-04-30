@@ -6,9 +6,19 @@ import java.awt.*;
 import main.java.util.AppContext;
 import main.java.entity.NhanVien;
 import main.java.App;
+import main.java.util.ImageUtil;
+import main.java.enumeration.LoaiNV;
 
 public class MainLayout extends JPanel {
+    
     private App mainFrame;
+    private BanHangPanel pnlBanHang;
+    private QLSanPhamPanel pnlSanPham;
+    private QLLoaiSanPham pnlLoaiSP;
+    private QLNhanVien pnlNhanVien;
+    private QLHoaDonPanel pnlHoaDon;
+    private ThongKePanel pnlThongKe;
+    private QLKhachHangPanel pnlKhachHang;
     
     public MainLayout(App mainFrame) {
         this.mainFrame = mainFrame;
@@ -18,81 +28,113 @@ public class MainLayout extends JPanel {
     public void renderUI() {
         removeAll();
 
-        // 1. Header
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(new Color(45, 52, 54));
-        header.setPreferredSize(new Dimension(0, 60));
+        JPanel panelHeader = new JPanel(new BorderLayout());
+        panelHeader.setBackground(new Color(45, 52, 54));
+        panelHeader.setPreferredSize(new Dimension(0, 60));
         
         JLabel lblTitle = new JLabel("  COFFEE HOUSE - HỆ THỐNG TẠI QUẦY", JLabel.LEFT);
         lblTitle.setForeground(Color.WHITE);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        header.add(lblTitle, BorderLayout.WEST);
+        panelHeader.add(lblTitle, BorderLayout.WEST);
 
-        JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
-        rightHeader.setOpaque(false);
+        JPanel panelUser = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
+        panelUser.setOpaque(false);
 
         NhanVien user = AppContext.getInstance().getCurrentUser();
-        String userName = (user != null) ? user.getTen() : "Guest";
-        JLabel lblUser = new JLabel("Xin chào, " + userName);
-        lblUser.setForeground(Color.WHITE);
-        lblUser.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-        rightHeader.add(lblUser);
+        if (user != null) {
+            String roleStr = (user.getLoai() == LoaiNV.ADMIN) ? "Quản lý" : "Nhân viên";
+            JLabel lblUserInfo = new JLabel(user.getTen() + " - " + roleStr);
+            lblUserInfo.setForeground(Color.WHITE);
+            lblUserInfo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            panelUser.add(lblUserInfo);
 
-        JButton btnLogout = new JButton("Đăng xuất");
-        btnLogout.setFocusPainted(false);
-        btnLogout.setBackground(new Color(231, 76, 60));
-        btnLogout.setForeground(Color.WHITE);
-        btnLogout.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnLogout.addActionListener(e -> {
+            ImageIcon avatar = ImageUtil.createIcon(user.getAnh(), 40, 40);
+            if (avatar != null) {
+                JLabel lblAvatar = new JLabel(avatar);
+                lblAvatar.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+                panelUser.add(lblAvatar);
+            }
+        }
+
+        JButton btnDangXuat = new JButton("Đăng xuất");
+        btnDangXuat.setBackground(new Color(231, 76, 60));
+        btnDangXuat.setForeground(Color.WHITE);
+        btnDangXuat.addActionListener(e -> {
             AppContext.getInstance().logout();
             mainFrame.showLoginPage();
         });
-        rightHeader.add(btnLogout);
-        header.add(rightHeader, BorderLayout.EAST);
-        add(header, BorderLayout.NORTH);
+        panelUser.add(btnDangXuat);
+        panelHeader.add(panelUser, BorderLayout.EAST);
+        add(panelHeader, BorderLayout.NORTH);
 
-        // Điều hướng
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.LEFT);
         tabs.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        tabs.setFocusable(false);
 
-        createTab(tabs, "Bán hàng", new SalePanel());
+        if (pnlBanHang == null) pnlBanHang = new BanHangPanel();
+        taoTab(tabs, "Bán hàng", pnlBanHang);
+        taoTab(tabs, "Khách hàng", taoPlaceholder());
 
         if (AppContext.getInstance().isAdmin()) {
-            createTab(tabs, "Sản phẩm", new ProductPanel());
-            createTab(tabs, "Loại sản phẩm", new ProductTypePanel());
-            createTab(tabs, "Nhân viên", new EmployeePanel());
-            createTab(tabs, "Hóa đơn", new InvoicePanel());
+            taoTab(tabs, "Sản phẩm", taoPlaceholder());
+            taoTab(tabs, "Loại sản phẩm", taoPlaceholder());
+            taoTab(tabs, "Nhân viên", taoPlaceholder());
+            taoTab(tabs, "Hóa đơn", taoPlaceholder());
         }
+        taoTab(tabs, "Thống kê", taoPlaceholder());
 
-        createTab(tabs, "Thống kê", new StatisticPanel());
+        tabs.addChangeListener(e -> {
+            int i = tabs.getSelectedIndex();
+            if (i != -1 && "placeholder".equals(tabs.getComponentAt(i).getName())) {
+                String title = ((JLabel) tabs.getTabComponentAt(i)).getText();
+                JPanel realPanel = null;
+                switch (title) {
+                    case "Sản phẩm":
+                        if (pnlSanPham == null) pnlSanPham = new QLSanPhamPanel();
+                        realPanel = pnlSanPham;
+                        break;
+                    case "Loại sản phẩm":
+                        if (pnlLoaiSP == null) pnlLoaiSP = new QLLoaiSanPham();
+                        realPanel = pnlLoaiSP;
+                        break;
+                    case "Nhân viên":
+                        if (pnlNhanVien == null) pnlNhanVien = new QLNhanVien();
+                        realPanel = pnlNhanVien;
+                        break;
+                    case "Hóa đơn":
+                        if (pnlHoaDon == null) pnlHoaDon = new QLHoaDonPanel();
+                        realPanel = pnlHoaDon;
+                        break;
+                    case "Thống kê":
+                        if (pnlThongKe == null) pnlThongKe = new ThongKePanel();
+                        realPanel = pnlThongKe;
+                        break;
+                    case "Khách hàng":
+                        if (pnlKhachHang == null) pnlKhachHang = new QLKhachHangPanel();
+                        realPanel = pnlKhachHang;
+                        break;
+                }
+                if (realPanel != null) tabs.setComponentAt(i, realPanel);
+            }
+        });
 
         add(tabs, BorderLayout.CENTER);
-
         revalidate();
         repaint();
     }
 
-    private void createTab(JTabbedPane tabs, String title, JPanel content) {
-        int index = tabs.getTabCount();
-        tabs.addTab(null, content);
-        
-        JLabel lbl = new JLabel(title, SwingConstants.CENTER);
-        lbl.setPreferredSize(new Dimension(130, 50));
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lbl.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-        
-        tabs.setTabComponentAt(index, lbl);
+    private JPanel taoPlaceholder() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setName("placeholder");
+        p.add(new JLabel("Đang tải dữ liệu...", JLabel.CENTER));
+        return p;
     }
 
-    private JPanel createPlaceholder(String title) {
-        JPanel p = new JPanel(new GridBagLayout());
-        p.setBackground(Color.WHITE);
-        JLabel lbl = new JLabel(title);
-        lbl.setFont(new Font("Segoe UI", Font.ITALIC, 20));
-        lbl.setForeground(Color.LIGHT_GRAY);
-        p.add(lbl);
-        return p;
+    private void taoTab(JTabbedPane tabs, String tieuDe, JPanel noiDung) {
+        int index = tabs.getTabCount();
+        tabs.addTab(null, noiDung);
+        JLabel lbl = new JLabel(tieuDe, SwingConstants.CENTER);
+        lbl.setPreferredSize(new Dimension(130, 50));
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        tabs.setTabComponentAt(index, lbl);
     }
 }

@@ -11,6 +11,7 @@ import main.java.dto.PaginatedResponse;
 import main.java.entity.HoaDon;
 import main.java.entity.KhachHang;
 import main.java.entity.NhanVien;
+import main.java.enumeration.LoaiNV;
 import main.java.enumeration.TrangThaiHD;
 
 public class HoaDonDAO {
@@ -29,27 +30,27 @@ public class HoaDonDAO {
         StringBuilder whereQuery = new StringBuilder();
 
         if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isBlank()) {
-            whereQuery.append("AND (ma LIKE ? OR sdtKH LIKE ?) ");
+            whereQuery.append("AND (hd.ma LIKE ? OR hd.sdtKH LIKE ?) ");
         }
         if (criteria.getTuNgay() != null) {
-            whereQuery.append("AND ngayLap >= ? ");
+            whereQuery.append("AND hd.ngayLap >= ? ");
         }
         if (criteria.getDenNgay() != null) {
-            whereQuery.append("AND ngayLap <= ? ");
+            whereQuery.append("AND hd.ngayLap <= ? ");
         }
         if (criteria.getMaNhanVien() != null && !criteria.getMaNhanVien().isBlank()) {
-            whereQuery.append("AND maNV = ? ");
+            whereQuery.append("AND hd.maNV = ? ");
         }
         if (criteria.getSdtKhachHang() != null && !criteria.getSdtKhachHang().isBlank()) {
-            whereQuery.append("AND sdtKH = ? ");
+            whereQuery.append("AND hd.sdtKH = ? ");
         }
         if (criteria.getTrangThai() != null) {
-            whereQuery.append("AND trangThai = ? ");
+            whereQuery.append("AND hd.trangThai = ? ");
         }
 
         long totalItems = 0;
         try (Connection conn = ConnectDB.getConnection()) {
-            String countSql = "SELECT COUNT(*) FROM HoaDon WHERE 1=1 " + whereQuery;
+            String countSql = "SELECT COUNT(*) FROM HoaDon hd WHERE 1=1 " + whereQuery;
             try (PreparedStatement psCount = conn.prepareStatement(countSql)) {
                 int pIndex = 1;
                 if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isBlank()) {
@@ -67,9 +68,17 @@ public class HoaDonDAO {
                 if (rsCount.next()) totalItems = rsCount.getLong(1);
             }
 
-            StringBuilder sql = new StringBuilder("SELECT * FROM HoaDon WHERE 1=1 ");
+            StringBuilder sql = new StringBuilder(
+                "SELECT hd.*, " +
+                "nv.ten AS nvTen, nv.sdt AS nvSdt, nv.matKhau AS nvMatKhau, nv.anh AS nvAnh, nv.loai AS nvLoai, " +
+                "kh.ten AS khTen, kh.diem AS khDiem " +
+                "FROM HoaDon hd " +
+                "LEFT JOIN NhanVien nv ON hd.maNV = nv.ma " +
+                "LEFT JOIN KhachHang kh ON hd.sdtKH = kh.sdt " +
+                "WHERE 1=1 "
+            );
             sql.append(whereQuery);
-            sql.append("ORDER BY ngayLap DESC ");
+            sql.append("ORDER BY hd.ngayLap DESC ");
 
             if (criteria.isPaginate()) {
                 sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
@@ -95,7 +104,7 @@ public class HoaDonDAO {
 
                 ResultSet rs = psData.executeQuery();
                 while (rs.next()) {
-                    result.add(mapResultSetToEntity(rs));
+                    result.add(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -107,12 +116,18 @@ public class HoaDonDAO {
 
     public List<HoaDon> getAll() {
         List<HoaDon> result = new ArrayList<>();
-        String sql = "SELECT * FROM HoaDon ORDER BY ngayLap DESC";
+        String sql = "SELECT hd.*, " +
+                     "nv.ten AS nvTen, nv.sdt AS nvSdt, nv.matKhau AS nvMatKhau, nv.anh AS nvAnh, nv.loai AS nvLoai, " +
+                     "kh.ten AS khTen, kh.diem AS khDiem " +
+                     "FROM HoaDon hd " +
+                     "LEFT JOIN NhanVien nv ON hd.maNV = nv.ma " +
+                     "LEFT JOIN KhachHang kh ON hd.sdtKH = kh.sdt " +
+                     "ORDER BY hd.ngayLap DESC";
         try (Connection conn = ConnectDB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(mapResultSetToEntity(rs));
+                result.add(rsToEntity(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,13 +136,19 @@ public class HoaDonDAO {
     }
 
     public Optional<HoaDon> getByMa(String ma) {
-        String sql = "SELECT * FROM HoaDon WHERE ma = ?";
+        String sql = "SELECT hd.*, " +
+                     "nv.ten AS nvTen, nv.sdt AS nvSdt, nv.matKhau AS nvMatKhau, nv.anh AS nvAnh, nv.loai AS nvLoai, " +
+                     "kh.ten AS khTen, kh.diem AS khDiem " +
+                     "FROM HoaDon hd " +
+                     "LEFT JOIN NhanVien nv ON hd.maNV = nv.ma " +
+                     "LEFT JOIN KhachHang kh ON hd.sdtKH = kh.sdt " +
+                     "WHERE hd.ma = ?";
         try (Connection conn = ConnectDB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, ma);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapResultSetToEntity(rs));
+                    return Optional.of(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -166,6 +187,21 @@ public class HoaDonDAO {
         return false;
     }
 
+    public boolean updateTrangThai(String ma, TrangThaiHD trangThai) {
+        String sql = "UPDATE HoaDon SET trangThai = ? WHERE ma = ?";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setString(1, trangThai.name());
+            ps.setString(2, ma);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean deleteAllByMaHD(List<String> listMaHD) {
         if (listMaHD == null || listMaHD.isEmpty()) return false;
         String placeholders = String.join(",", listMaHD.stream().map(id -> "?").toArray(String[]::new));
@@ -184,18 +220,31 @@ public class HoaDonDAO {
         return false;
     }
 
-    private HoaDon mapResultSetToEntity(ResultSet rs) throws SQLException {
+
+
+    private HoaDon rsToEntity(ResultSet rs) throws SQLException {
         HoaDon hd = new HoaDon();
         hd.setMa(rs.getString("ma"));
         
         String maNV = rs.getString("maNV");
         if (maNV != null) {
-            hd.setNhanVien(new NhanVien(maNV));
+            hd.setNhanVien(new NhanVien(
+                maNV,
+                rs.getString("nvTen"),
+                rs.getString("nvSdt"),
+                rs.getString("nvMatKhau"),
+                rs.getString("nvAnh"),
+                LoaiNV.fromString(rs.getString("nvLoai"))
+            ));
         }
         
         String sdtKH = rs.getString("sdtKH");
         if (sdtKH != null) {
-            hd.setKhachHang(new KhachHang(sdtKH));
+            hd.setKhachHang(new KhachHang(
+                sdtKH,
+                rs.getString("khTen"),
+                rs.getInt("khDiem")
+            ));
         }
         
         Timestamp ts = rs.getTimestamp("ngayLap");

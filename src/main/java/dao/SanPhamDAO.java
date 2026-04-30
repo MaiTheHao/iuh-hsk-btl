@@ -39,6 +39,9 @@ public class SanPhamDAO {
         if (criteria.getGiaDen() != null) {
             whereQuery.append("AND sp.gia <= ? ");
         }
+        if (criteria.getTrangThai() != null) {
+            whereQuery.append("AND sp.trangThai = ? ");
+        }
 
         long totalItems = 0;
         try (Connection conn = ConnectDB.getConnection()) {
@@ -52,6 +55,7 @@ public class SanPhamDAO {
                 }
                 if (criteria.getGiaTu() != null) psCount.setDouble(pIndex++, criteria.getGiaTu());
                 if (criteria.getGiaDen() != null) psCount.setDouble(pIndex++, criteria.getGiaDen());
+                if (criteria.getTrangThai() != null) psCount.setString(pIndex++, criteria.getTrangThai().name());
                 ResultSet rsCount = psCount.executeQuery();
                 if (rsCount.next()) totalItems = rsCount.getLong(1);
             }
@@ -86,8 +90,13 @@ public class SanPhamDAO {
             try (PreparedStatement psData = conn.prepareStatement(sql.toString())) {
                 int pIndex = 1;
                 if (criteria.getMaLoai() != null && !criteria.getMaLoai().isEmpty()) psData.setString(pIndex++, criteria.getMaLoai());
+                if (criteria.getTuKhoa() != null && !criteria.getTuKhoa().isEmpty()) {
+                    psData.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                    psData.setString(pIndex++, "%" + criteria.getTuKhoa() + "%");
+                }
                 if (criteria.getGiaTu() != null) psData.setDouble(pIndex++, criteria.getGiaTu());
                 if (criteria.getGiaDen() != null) psData.setDouble(pIndex++, criteria.getGiaDen());
+                if (criteria.getTrangThai() != null) psData.setString(pIndex++, criteria.getTrangThai().name());
                 
                 if (criteria.isPaginate()) {
                     psData.setInt(pIndex++, criteria.getOffset());
@@ -96,16 +105,7 @@ public class SanPhamDAO {
 
                 ResultSet rs = psData.executeQuery();
                 while (rs.next()) {
-                    result.add(new SanPham(
-                        rs.getString("ma"),
-                        rs.getString("ten"),
-                        rs.getString("moTa"),
-                        rs.getString("anh"),
-                        rs.getDouble("gia"),
-                        rs.getInt("soLuong"),
-                        new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
-                        TrangThaiSP.fromString(rs.getString("trangThai"))
-                    ));
+                    result.add(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -123,16 +123,7 @@ public class SanPhamDAO {
             ps.setString(1, ma);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return Optional.of(new SanPham(
-                    rs.getString("ma"),
-                    rs.getString("ten"),
-                    rs.getString("moTa"),
-                    rs.getString("anh"),
-                    rs.getDouble("gia"),
-                    rs.getInt("soLuong"),
-                    new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
-                    TrangThaiSP.fromString(rs.getString("trangThai"))
-                ));
+                return Optional.of(rsToEntity(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,6 +186,21 @@ public class SanPhamDAO {
         }
         return false;
     }
+
+    public boolean updateTrangThai(String ma, TrangThaiSP trangThai) {
+        String sql = "UPDATE SanPham SET trangThai = ? WHERE ma = ?";
+        try (
+            Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setString(1, trangThai.name());
+            ps.setString(2, ma);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     
     public boolean deleteAllByMaSP(List<String> listMaSP) {
         if (listMaSP == null || listMaSP.isEmpty()) return false;
@@ -212,5 +218,19 @@ public class SanPhamDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    private SanPham rsToEntity(ResultSet rs) throws SQLException {
+        return new SanPham(
+            rs.getString("ma"),
+            rs.getString("ten"),
+            rs.getString("moTa"),
+            rs.getString("anh"),
+            rs.getDouble("gia"),
+            rs.getInt("soLuong"),
+            new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
+            TrangThaiSP.fromString(rs.getString("trangThai"))
+        );
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import main.java.connectDB.ConnectDB;
 import main.java.entity.ChiTietHD;
 import main.java.entity.HoaDon;
+import main.java.entity.LoaiSP;
 import main.java.entity.SanPham;
 
 public class ChiTietHDDAO {
@@ -20,13 +21,19 @@ public class ChiTietHDDAO {
 
     public List<ChiTietHD> getByMaHD(String maHD) {
         List<ChiTietHD> result = new ArrayList<>();
-        String sql = "SELECT * FROM ChiTietHD WHERE maHD = ?";
+        String sql = "SELECT ct.*, " +
+                     "sp.ten AS tenSP, sp.moTa AS moTaSP, sp.anh AS anhSP, sp.gia AS giaSP, sp.soLuong AS soLuongSP, sp.trangThai AS trangThaiSP, " +
+                     "l.ma AS maLoai, l.ten AS tenLoai, l.moTa AS moTaLoai " +
+                     "FROM ChiTietHD ct " +
+                     "JOIN SanPham sp ON ct.maSP = sp.ma " +
+                     "LEFT JOIN LoaiSP l ON sp.maLoai = l.ma " +
+                     "WHERE ct.maHD = ?";
         try (Connection conn = ConnectDB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maHD);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    result.add(mapResultSetToEntity(rs));
+                    result.add(rsToEntity(rs));
                 }
             }
         } catch (SQLException e) {
@@ -69,10 +76,22 @@ public class ChiTietHDDAO {
         return false;
     }
 
-    private ChiTietHD mapResultSetToEntity(ResultSet rs) throws SQLException {
+    private ChiTietHD rsToEntity(ResultSet rs) throws SQLException {
         ChiTietHD ct = new ChiTietHD();
         ct.setHoaDon(new HoaDon(rs.getString("maHD")));
-        ct.setSanPham(new SanPham(rs.getString("maSP")));
+        
+        SanPham sp = new SanPham(
+            rs.getString("maSP"),
+            rs.getString("tenSP"),
+            rs.getString("moTaSP"),
+            rs.getString("anhSP"),
+            rs.getDouble("giaSP"),
+            rs.getInt("soLuongSP"),
+            new LoaiSP(rs.getString("maLoai"), rs.getString("tenLoai"), rs.getString("moTaLoai")),
+            main.java.enumeration.TrangThaiSP.fromString(rs.getString("trangThaiSP"))
+        );
+        ct.setSanPham(sp);
+        
         ct.setSoLuong(rs.getInt("soLuong"));
         ct.setDonGia(rs.getDouble("donGia"));
         ct.setThanhTien(rs.getDouble("thanhTien"));

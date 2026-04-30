@@ -1,6 +1,7 @@
 package main.java.dto;
 
 import main.java.enumeration.SortDirection;
+import main.java.enumeration.TrangThaiSP;
 
 public class SanPhamGetListCriteria extends BaseGetListCriteria {
     private String maLoai;
@@ -9,8 +10,17 @@ public class SanPhamGetListCriteria extends BaseGetListCriteria {
     private Double giaDen;
     private SortDirection sapXepMa = SortDirection.NONE;
     private SortDirection sapXepGia = SortDirection.NONE;
+    private TrangThaiSP trangThai;
 
     public SanPhamGetListCriteria() {
+    }
+
+    public TrangThaiSP getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(TrangThaiSP trangThai) {
+        this.trangThai = trangThai;
     }
 
     public String getTuKhoa() {
