@@ -10,6 +10,9 @@ import main.java.dto.PaginatedResponse;
 import main.java.entity.LoaiSP;
 import main.java.enumeration.SortDirection;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class LoaiSPDAO {
   private static LoaiSPDAO instance = new LoaiSPDAO();
 

@@ -14,6 +14,9 @@ import main.java.entity.NhanVien;
 import main.java.enumeration.LoaiNV;
 import main.java.enumeration.TrangThaiHD;
 
+/**
+ * @author: Trần Thanh Nhựt
+ */
 public class HoaDonDAO {
     private static HoaDonDAO instance = new HoaDonDAO();
 

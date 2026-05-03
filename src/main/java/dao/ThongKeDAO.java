@@ -9,6 +9,9 @@ import main.java.dto.DoanhThuNgayDTO;
 import main.java.dto.ThongKeTongQuanDTO;
 import main.java.dto.TopSanPhamDTO;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class ThongKeDAO {
     private static ThongKeDAO instance = new ThongKeDAO();
 

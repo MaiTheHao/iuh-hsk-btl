@@ -11,6 +11,9 @@ import main.java.util.AppContext;
 import main.java.util.AppRegex;
 import main.java.util.AppColor;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class DangNhap extends JPanel {
     private JTextField txtSdt;
     private JPasswordField txtMatKhau;

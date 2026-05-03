@@ -9,6 +9,9 @@ import main.java.App;
 import main.java.util.ImageUtil;
 import main.java.enumeration.LoaiNV;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class MainLayout extends JPanel {
     
     private App mainFrame;

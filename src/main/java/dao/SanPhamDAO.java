@@ -12,6 +12,9 @@ import main.java.entity.SanPham;
 import main.java.enumeration.SortDirection;
 import main.java.enumeration.TrangThaiSP;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class SanPhamDAO {
     private static SanPhamDAO instance = new SanPhamDAO();
 

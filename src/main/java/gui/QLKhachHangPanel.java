@@ -15,6 +15,9 @@ import main.java.util.AppColor;
 import main.java.dto.KhachHangGetListCriteria;
 import main.java.dto.PaginatedResponse;
 
+/**
+ * @author: Trần Thanh Nhựt
+ */
 public class QLKhachHangPanel extends JPanel {
 
     private JTable tableKhachHang;

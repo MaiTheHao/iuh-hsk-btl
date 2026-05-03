@@ -18,6 +18,9 @@ import main.java.util.AppColor;
 import main.java.dto.NhanVienGetListCriteria;
 import main.java.dto.PaginatedResponse;
 
+/**
+ * @author: Trần Thanh Nhựt
+ */
 public class QLNhanVien extends JPanel {
 
     private JTable tableNhanVien;

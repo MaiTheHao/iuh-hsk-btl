@@ -19,6 +19,9 @@ import main.java.enumeration.TrangThaiSP;
 import main.java.util.AppColor;
 import main.java.util.ImageUtil;
 
+/**
+ * @author: Trần Thanh Nhựt
+ */
 public class QLSanPhamPanel extends JPanel {
 
     private JTable tableSanPham;

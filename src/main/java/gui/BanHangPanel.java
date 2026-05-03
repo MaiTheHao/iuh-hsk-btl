@@ -24,8 +24,10 @@ import main.java.util.ImageUtil;
 import main.java.util.AppColor;
 import main.java.dto.SanPhamGetListCriteria;
 import main.java.dto.LoaiSPGetListCriteria;
-import main.java.dto.PaginatedResponse;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class BanHangPanel extends JPanel {
 
     private JTable tableSanPham, tableGioHang;

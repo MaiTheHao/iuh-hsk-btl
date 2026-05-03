@@ -3,6 +3,9 @@ package main.java.util;
 import main.java.entity.NhanVien;
 import main.java.enumeration.LoaiNV;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class AppContext {
     private static AppContext instance;
     private NhanVien currentUser;

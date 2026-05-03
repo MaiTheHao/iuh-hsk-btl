@@ -12,6 +12,9 @@ import main.java.dao.LoaiSPDAO;
 import main.java.entity.LoaiSP;
 import main.java.util.AppColor;
 
+/**
+ * @author: Nguyễn Lương Triều Vỹ
+ */
 public class QLLoaiSanPham extends JPanel {
 
     private JTable tableLoaiSP;

@@ -13,6 +13,9 @@ import main.java.dto.DoanhThuNgayDTO;
 import main.java.dto.ThongKeTongQuanDTO;
 import main.java.dto.TopSanPhamDTO;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class ThongKePanel extends JPanel {
 
     private JLabel lblDoanhThuNgay, lblSoHoaDonNgay, lblSpSapHet, lblDoanhThuThang;

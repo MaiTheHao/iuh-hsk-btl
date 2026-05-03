@@ -10,6 +10,9 @@ import main.java.dto.PaginatedResponse;
 import main.java.entity.NhanVien;
 import main.java.enumeration.SortDirection;
 
+/**
+ * @author: Nguyễn Lương Triều Vỹ
+ */
 public class NhanVienDAO {
     private static NhanVienDAO instance = new NhanVienDAO();
 

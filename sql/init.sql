@@ -78,6 +78,17 @@ GO
 ALTER TABLE [ChiTietHD] ADD FOREIGN KEY ([maSP]) REFERENCES [SanPham] ([ma])
 GO
 
+/*
+Mai Thế Hào
+sp_GetDoanhThuTheoNgay(@startDate, @endDate)
+desc:
+  Trả về doanh thu theo ngày trong khoảng thời gian nhất định, chỉ tính các hóa đơn có trạng thái 'PAID'.
+  Sắp xếp kết quả theo ngày tăng dần.
+return:
+- DATETIME Ngay: Ngày lập hóa đơn
+- INT SoHoaDon: Số lượng hóa đơn đã thanh toán trong ngày
+- DECIMAL(18,2) DoanhThu: Tổng doanh thu của ngày đó
+*/
 CREATE OR ALTER PROCEDURE sp_GetDoanhThuTheoNgay
     @startDate DATETIME,
     @endDate DATETIME
@@ -95,6 +106,18 @@ BEGIN
 END;
 GO
 
+/*
+Mai Thế Hào
+sp_GetTopSanPhamBanChay(@startDate, @endDate, @limit)
+desc:
+  Trả về danh sách top sản phẩm bán chạy nhất trong khoảng thời gian nhất định, chỉ tính các hóa đơn có trạng thái 'PAID'.
+  Sắp xếp kết quả theo số lượng đã bán giảm dần.
+return:
+- VARCHAR(255) MaSP: Mã sản phẩm
+- NVARCHAR(255) TenSP: Tên sản phẩm
+- INT SoLuongDaBan: Tổng số lượng đã bán của sản phẩm
+- DECIMAL(18,2) TongTien: Tổng doanh thu từ sản phẩm đó
+*/
 CREATE OR ALTER PROCEDURE sp_GetTopSanPhamBanChay
     @startDate DATETIME,
     @endDate DATETIME,
@@ -116,6 +139,17 @@ BEGIN
 END;
 GO
 
+/*
+Mai Thế Hào
+sp_GetTongQuan()
+desc:
+  Trả về tổng quan về doanh thu hôm nay, số hóa đơn hôm nay, số sản phẩm sắp hết hàng (soLuong < 10), và tổng doanh thu tháng này.
+return:
+- DECIMAL(18,2) DoanhThuHomNay: Doanh thu của ngày hôm nay
+- INT SoHoaDonHomNay: Số lượng hóa đơn đã thanh toán của ngày hôm nay
+- INT SoSPCanNhap: Số lượng sản phẩm có số lượng tồn kho nhỏ hơn 10
+- DECIMAL(18,2) DoanhThuThangNay: Tổng doanh thu của tháng hiện tại
+*/
 CREATE OR ALTER PROCEDURE sp_GetTongQuan
 AS
 BEGIN

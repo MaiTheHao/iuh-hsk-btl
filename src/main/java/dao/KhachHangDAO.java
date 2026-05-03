@@ -10,6 +10,9 @@ import main.java.dto.PaginatedResponse;
 import main.java.entity.KhachHang;
 import main.java.enumeration.SortDirection;
 
+/**
+ * @author: Nguyễn Lương Triều Vỹ
+ */
 public class KhachHangDAO {
     private static KhachHangDAO instance = new KhachHangDAO();
 

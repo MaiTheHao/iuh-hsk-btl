@@ -9,6 +9,9 @@ import main.java.entity.HoaDon;
 import main.java.entity.LoaiSP;
 import main.java.entity.SanPham;
 
+/**
+ * @author: Trần Thanh Nhựt
+ */
 public class ChiTietHDDAO {
     private static ChiTietHDDAO instance = new ChiTietHDDAO();
 
