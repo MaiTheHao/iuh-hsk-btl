@@ -5,6 +5,9 @@ import java.awt.*;
 import main.java.gui.DangNhap;
 import main.java.gui.MainLayout;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public class App extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;

@@ -2,6 +2,9 @@ package main.java.util;
 
 import java.util.regex.Pattern;
 
+/**
+ * @author: Mai Thế Hào
+ */
 public final class AppRegex {
     private AppRegex() {}
 

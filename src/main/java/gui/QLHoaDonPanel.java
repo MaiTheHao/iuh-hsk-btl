@@ -25,7 +25,7 @@ public class QLHoaDonPanel extends JPanel {
     private DefaultTableModel tableModelHoaDon, tableModelChiTiet;
     private JTextField txtTimKiem;
     private JComboBox<String> cboTrangThai;
-    private JButton btnHuyHoaDon;
+    private JButton btnHuyHoaDon, btnIn, btnPDF;
     private List<HoaDon> dsHoaDon = new ArrayList<>();
     
     public QLHoaDonPanel() {
@@ -49,11 +49,6 @@ public class QLHoaDonPanel extends JPanel {
         cboTrangThai = new JComboBox<>(new String[]{"Tất cả", "Chờ thanh toán", "Đã thanh toán", "Đã hủy"});
         cboTrangThai.setPreferredSize(new Dimension(150, 30));
         panelTimKiem.add(cboTrangThai);
-
-        btnHuyHoaDon = new JButton("Hủy hóa đơn");
-        btnHuyHoaDon.setBackground(AppColor.ERROR);
-        btnHuyHoaDon.setForeground(Color.WHITE);
-        panelTimKiem.add(btnHuyHoaDon);
 
         add(panelTimKiem, BorderLayout.NORTH);
 
@@ -86,24 +81,53 @@ public class QLHoaDonPanel extends JPanel {
         splitPane.setBottomComponent(pnlChiTiet);
 
         add(splitPane, BorderLayout.CENTER);
+
+        JPanel panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        panelButtons.setOpaque(false);
+
+        btnHuyHoaDon = new JButton("HỦY HÓA ĐƠN");
+        btnHuyHoaDon.setBackground(AppColor.ERROR);
+        btnHuyHoaDon.setForeground(Color.WHITE);
+        btnHuyHoaDon.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        panelButtons.add(btnHuyHoaDon);
+
+        btnIn = new JButton("IN HÓA ĐƠN");
+        btnIn.setBackground(AppColor.INFO);
+        btnIn.setForeground(Color.WHITE);
+        btnIn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        panelButtons.add(btnIn);
+
+        btnPDF = new JButton("XUẤT PDF");
+        btnPDF.setBackground(AppColor.WARN);
+        btnPDF.setForeground(Color.WHITE);
+        btnPDF.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        panelButtons.add(btnPDF);
+
+        add(panelButtons, BorderLayout.SOUTH);
     }
 
     private void bindEvents() {
         txtTimKiem.addActionListener(e -> loadData());
         cboTrangThai.addActionListener(e -> loadData());
         btnHuyHoaDon.addActionListener(e -> handleHuyHoaDon());
+        btnIn.addActionListener(e -> handleInHoaDon());
+        btnPDF.addActionListener(e -> handleXuatPDF());
 
         tableHoaDon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = tableHoaDon.getSelectedRow();
-                if (row >= 0) loadDetails(dsHoaDon.get(row).getMa());
+                if (row >= 0) {
+                    String maHD = (String) tableModelHoaDon.getValueAt(row, 0);
+                    loadDetails(maHD);
+                }
             }
         });
     }
 
     private void loadData() {
         tableModelHoaDon.setRowCount(0);
+        tableModelChiTiet.setRowCount(0);
         HoaDonGetListCriteria criteria = new HoaDonGetListCriteria();
         criteria.setTuKhoa(txtTimKiem.getText().trim());
         
@@ -153,12 +177,36 @@ public class QLHoaDonPanel extends JPanel {
         }
 
         String ma = (String) tableModelHoaDon.getValueAt(row, 0);
+        String trangThai = (String) tableModelHoaDon.getValueAt(row, 6);
+        
+        if (trangThai.equals("Đã hủy")) {
+            JOptionPane.showMessageDialog(this, "Hóa đơn này đã được hủy trước đó!");
+            return;
+        }
+
         if (JOptionPane.showConfirmDialog(this, "Hủy hóa đơn " + ma + "? Chức năng này không thể hoàn tác!", "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            if (HoaDonDAO.getInstance().updateTrangThai(ma, main.java.enumeration.TrangThaiHD.CANCELLED)) {
+            if (HoaDonDAO.getInstance().updateTrangThai(ma, TrangThaiHD.CANCELLED)) {
                 JOptionPane.showMessageDialog(this, "Đã hủy hóa đơn thành công!");
                 loadData();
                 tableModelChiTiet.setRowCount(0);
             }
         }
+    }
+    private void handleInHoaDon() {
+        int row = tableHoaDon.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hóa đơn để in!");
+            return;
+        }
+        JOptionPane.showMessageDialog(this, "Đang kết nối máy in...");
+    }
+
+    private void handleXuatPDF() {
+        int row = tableHoaDon.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hóa đơn để xuất PDF!");
+            return;
+        }
+        JOptionPane.showMessageDialog(this, "Đang xuất PDF...");
     }
 }

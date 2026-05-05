@@ -8,6 +8,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 
+/**
+ * Lớp kết nối Cơ sở dữ liệu.
+ * <p>
+ * Lưu ý: Copy file 'src/main/resources/env.example.xml' thành 'env.xml'
+ * và cấu hình các thông số (url, user, password) phù hợp với SQL Server cục bộ.
+ * </p>
+ * 
+ * @author: Mai Thế Hào
+ */
 public class ConnectDB {
     private static String url;
     private static String user;

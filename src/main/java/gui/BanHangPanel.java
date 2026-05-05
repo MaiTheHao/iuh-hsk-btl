@@ -279,7 +279,7 @@ public class BanHangPanel extends JPanel {
                 for (SanPham sp : dsSanPham) {
                     if (search.isEmpty() || sp.getTen().toLowerCase().contains(search) || sp.getMa().toLowerCase().contains(search)) {
                         String tenHienThi = sp.getTen();
-                        if (sp.getSoLuong() <= 0) tenHienThi = "<html><font color='red'>[HẾT HÀNG]</font> " + tenHienThi + "</html>";
+                        if (sp.getSoLuong() <= 0) tenHienThi = "[HẾT HÀNG] " + tenHienThi;
                         
                         publish(new Object[]{
                             ImageUtil.createIcon(sp.getAnh(), 70, 70), 

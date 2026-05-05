@@ -60,7 +60,6 @@ Hệ thống được phát triển nhằm tự động hóa các quy trình ngh
 > **Nhóm Báo cáo - Thống kê**
 - [ ] **Thống kê doanh thu:** Theo ngày, tháng, năm.
 - [ ] **Thống kê sản phẩm:** Top sản phẩm bán chạy nhất.
-- [ ] **Thống kê nhân sự:** Đánh giá hiệu suất bán hàng của nhân viên.
 
 ---
 

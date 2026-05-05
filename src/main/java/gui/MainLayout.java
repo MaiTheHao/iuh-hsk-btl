@@ -87,36 +87,42 @@ public class MainLayout extends JPanel {
 
         tabs.addChangeListener(e -> {
             int i = tabs.getSelectedIndex();
-            if (i != -1 && "placeholder".equals(tabs.getComponentAt(i).getName())) {
-                String title = ((JLabel) tabs.getTabComponentAt(i)).getText();
-                JPanel realPanel = null;
-                switch (title) {
-                    case "Sản phẩm":
-                        if (pnlSanPham == null) pnlSanPham = new QLSanPhamPanel();
-                        realPanel = pnlSanPham;
-                        break;
-                    case "Loại sản phẩm":
-                        if (pnlLoaiSP == null) pnlLoaiSP = new QLLoaiSanPham();
-                        realPanel = pnlLoaiSP;
-                        break;
-                    case "Nhân viên":
-                        if (pnlNhanVien == null) pnlNhanVien = new QLNhanVien();
-                        realPanel = pnlNhanVien;
-                        break;
-                    case "Hóa đơn":
-                        if (pnlHoaDon == null) pnlHoaDon = new QLHoaDonPanel();
-                        realPanel = pnlHoaDon;
-                        break;
-                    case "Thống kê":
-                        if (pnlThongKe == null) pnlThongKe = new ThongKePanel();
-                        realPanel = pnlThongKe;
-                        break;
-                    case "Khách hàng":
-                        if (pnlKhachHang == null) pnlKhachHang = new QLKhachHangPanel();
-                        realPanel = pnlKhachHang;
-                        break;
+            if (i >= 0 && i < tabs.getTabCount() && tabs.getComponentAt(i) != null) {
+                Component comp = tabs.getComponentAt(i);
+                if (comp instanceof JPanel && "placeholder".equals(comp.getName())) {
+                    String title = "";
+                    Component tabComp = tabs.getTabComponentAt(i);
+                    if (tabComp instanceof JLabel) title = ((JLabel) tabComp).getText();
+                    
+                    JPanel pnlInstance = null;
+                    switch (title) {
+                        case "Sản phẩm":
+                            if (pnlSanPham == null) pnlSanPham = new QLSanPhamPanel();
+                            pnlInstance = pnlSanPham;
+                            break;
+                        case "Loại sản phẩm":
+                            if (pnlLoaiSP == null) pnlLoaiSP = new QLLoaiSanPham();
+                            pnlInstance = pnlLoaiSP;
+                            break;
+                        case "Nhân viên":
+                            if (pnlNhanVien == null) pnlNhanVien = new QLNhanVien();
+                            pnlInstance = pnlNhanVien;
+                            break;
+                        case "Hóa đơn":
+                            if (pnlHoaDon == null) pnlHoaDon = new QLHoaDonPanel();
+                            pnlInstance = pnlHoaDon;
+                            break;
+                        case "Thống kê":
+                            if (pnlThongKe == null) pnlThongKe = new ThongKePanel();
+                            pnlInstance = pnlThongKe;
+                            break;
+                        case "Khách hàng":
+                            if (pnlKhachHang == null) pnlKhachHang = new QLKhachHangPanel();
+                            pnlInstance = pnlKhachHang;
+                            break;
+                    }
+                    if (pnlInstance != null) tabs.setComponentAt(i, pnlInstance);
                 }
-                if (realPanel != null) tabs.setComponentAt(i, realPanel);
             }
         });
 

@@ -23,9 +23,9 @@ GO
 
 -- 3. Mock dữ liệu cho NhanVien (Nhân Viên)
 INSERT INTO [NhanVien] ([ma], [ten], [sdt], [matKhau], [anh], [loai]) VALUES
-('admin01', N'Admin Hào', '0832690938', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hao', 'ADMIN'),
-('admin02', N'Admin Vỹ', '0985138313', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vy', 'ADMIN'),
-('admin03', N'Admin Nhựt', '0355455564', 'SystemAdmin@123', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nhut', 'ADMIN')
+('admin01', N'Admin Hào', '0832690938', 'SystemAdmin@123', 'https://png.pngtree.com/png-vector/20230316/ourmid/pngtree-admin-and-customer-service-job-vacancies-vector-png-image_6650726.png', 'ADMIN'),
+('admin02', N'Admin Vỹ', '0985138313', 'SystemAdmin@123', 'https://png.pngtree.com/png-vector/20230316/ourmid/pngtree-admin-and-customer-service-job-vacancies-vector-png-image_6650726.png', 'ADMIN'),
+('admin03', N'Admin Nhựt', '0355455564', 'SystemAdmin@123', 'https://png.pngtree.com/png-vector/20230316/ourmid/pngtree-admin-and-customer-service-job-vacancies-vector-png-image_6650726.png', 'ADMIN')
 GO
 
 -- 4. Mock dữ liệu cho KhachHang (Khách Hàng)
