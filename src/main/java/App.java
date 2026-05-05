@@ -45,10 +45,6 @@ public class App extends JFrame {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        } catch (Exception ignored) {}
-
         SwingUtilities.invokeLater(() -> new App().setVisible(true));
     }
 }
